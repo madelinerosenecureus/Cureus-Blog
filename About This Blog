@@ -1,0 +1,679 @@
+<!--
+  templateType: page
+  isAvailableForNewContent: true
+  label: Cureus - About Blog
+-->
+<!DOCTYPE html>
+<html lang="{{ html_lang }}" {{ html_lang_dir }}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ content.html_title }}</title>
+  {{ standard_header_includes }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts (Inter + Roboto Slab) are self-declared via @font-face in the CSS below.
+       The Google Fonts stylesheet link was removed because its subset-based faces
+       conflicted with and blocked reliable loading on this page. -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    /* Direct @font-face — loads the full variable fonts reliably. Google Fonts' lazy per-weight
+       loading intermittently fails to apply on this HubSpot page, so we declare the faces here. */
+    @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2');}
+    @font-face{font-family:'Roboto Slab';font-style:normal;font-weight:100 900;font-display:swap;src:url('https://fonts.gstatic.com/s/robotoslab/v36/BngMUXZYTXPIvIBgJJSb6ufN5qWr4xCC.woff2') format('woff2');}
+    :root{
+      --teal:#1a9fbd;          /* primary accent (matches blog listing) */
+      --teal-dark:#127f99;
+      --line:#e7ebee;
+      --sans:'Inter','Helvetica Neue',Arial,sans-serif;
+    }
+    body {
+      margin: 0;
+      font-family: 'Roboto Slab', Georgia, 'Times New Roman', serif;
+      color: #212529;
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    img { border-radius: 0 !important; } /* all images render with square corners */
+    /* ── Typography helpers ── */
+    .graphik { font-family: 'Inter', 'Inter', Arial, sans-serif; }
+    /* ─────────────────────────────────────────────
+       NAV ROW 1 — Primary menu (matches blog listing page)
+    ───────────────────────────────────────────── */
+    .nav{ border-bottom:1px solid var(--line); background:#fff; }
+    .nav__inner{ display:flex; align-items:center; gap:28px; max-width:1280px; margin:0 auto; padding:18px 40px; }
+    .nav__menu{ display:flex; align-items:center; gap:26px; list-style:none; margin:0; padding:0; flex:1; }
+    .nav__menu > li{ position:relative; }
+    .nav__link{ font-family:var(--sans); font-size:15px; color:#73797e; text-decoration:none; white-space:nowrap; }
+    .nav__link:hover{ color:var(--teal); }
+    .nav__menu > li:hover .nav__dd{ display:block; }
+    /* Transparent bridge across the 14px gap so the dropdown stays open while the cursor moves onto it */
+    .nav__dd::before{ content:""; position:absolute; left:0; right:0; top:-14px; height:14px; }
+    .nav__dd{ display:none; position:absolute; top:100%; left:0; margin-top:14px; background:#fff; border:1px solid var(--line);
+      list-style:none; padding:6px 0; min-width:210px; z-index:200; box-shadow:0 10px 30px rgba(20,40,60,.10); border-radius:8px; }
+    .nav__dd li a{ display:block; padding:9px 18px; font-family:var(--sans); font-size:14px; color:#2b3137; text-decoration:none; }
+    .nav__dd li a:hover{ background:#f5fafc; color:var(--teal); }
+    .nav__right{ display:flex; align-items:center; gap:18px; }
+    .nav__cta{ display:inline-flex; align-items:center; gap:10px; background:#0096b7; color:#fff; text-decoration:none; font-family:var(--sans); font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:normal; padding:13px 16px; border-radius:8px; white-space:nowrap; }
+    .nav__cta svg{ flex-shrink:0; }
+    .nav__cta:hover{ background:#007e99; }
+    /* ─────────────────────────────────────────────
+       NAV ROW 2 — Secondary menu, right-aligned (matches blog listing sub-nav)
+    ───────────────────────────────────────────── */
+    .subnav{ border-bottom:1px solid var(--line); background:#fff; }
+    .subnav__inner{ display:flex; justify-content:center; max-width:1280px; margin:0 auto; padding:0 40px; }
+    .subnav__menu{ display:flex; align-items:center; gap:22px; list-style:none; margin:0; padding:0; }
+    .subnav__menu > li{ position:relative; }
+    .subnav__link{ display:flex; align-items:center; height:48px; font-family:var(--sans); font-size:14px; color:#52606b; text-decoration:none; white-space:nowrap; }
+    .subnav__link:hover{ color:var(--teal); }
+    .subnav__menu > li:hover .subnav__dd{ display:block; }
+    .subnav__dd{ display:none; position:absolute; top:100%; right:0; background:#fff; border:1px solid var(--line); list-style:none;
+      margin:0; padding:6px 0; min-width:220px; z-index:200; box-shadow:0 10px 30px rgba(20,40,60,.10); border-radius:8px; }
+    .subnav__dd li a{ display:block; padding:9px 18px; font-family:var(--sans); font-size:14px; color:#2b3137; text-decoration:none; }
+    .subnav__dd li a:hover{ background:#f5fafc; color:var(--teal); }
+    /* Hide the embedded video (a drag-and-drop oembed module that can't be removed from template markup) */
+    .dnd-section:has(.oembed_container){ display:none !important; }
+    /* ── Override drag-and-drop page-content teal eyebrow labels to match the blog listing eyebrow ──
+       These labels are page content (inline-styled), so they can't be changed from the template markup
+       on an already-published page — this rule restyles them via CSS, which does reach the page. ── */
+    [style*="0096b7"]{
+      color:#1a9fbd !important;
+      font-weight:700 !important;
+      letter-spacing:.18em !important;
+      font-family:'Inter','Helvetica Neue',Arial,sans-serif !important;
+    }
+    /* ── Page layout ── */
+    .page-outer {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .page-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 80px;
+    }
+    /* ── Section titles ── */
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 40px 0 20px;
+      border-top: 1px solid #e4e7ec;
+      border-bottom: 1px solid #e4e7ec;
+    }
+    .section-title {
+      font-family: 'Roboto Slab', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: #000;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: -0.64px;
+      line-height: 38px;
+      margin: 0;
+    }
+    .section-subtitle {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: #1a9fbd;
+      text-transform: uppercase;
+      letter-spacing: 0.88px;
+      line-height: 18px;
+      text-align: center;
+      margin: 0;
+    }
+    /* ── Footer ── */
+    .site-footer { background: #f4f4f4; border-top: 1px solid #e4e7ec; }
+    .footer-cols {
+      display: flex;
+      padding: 0 80px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .footer-col {
+      flex: 1;
+      padding: 16px 16px 20px;
+      border-right: 1px solid #e4e7ec;
+    }
+    .footer-col:first-child { padding-left: 0; }
+    .footer-col:last-child { border-right: none; padding-right: 0; }
+    .footer-col h4 {
+      font-family: 'Roboto Slab', Georgia, serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #000;
+      line-height: 32px;
+      margin: 20px 0 16px;
+    }
+    .footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .footer-col li a {
+      font-family: 'Roboto Slab', Georgia, serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #73797e;
+      text-decoration: none;
+      line-height: 24px;
+    }
+    .footer-col li a:hover { color: #1a9fbd; }
+    .footer-newsletter {
+      background: #e9e9e9;
+      padding: 0 80px 20px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .footer-newsletter__row {
+      border-top: 1px solid #e4e7ec;
+      border-bottom: 1px solid #e4e7ec;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 40px 0 20px;
+    }
+    .footer-newsletter__title {
+      font-family: 'Roboto Slab', Georgia, serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: -0.64px;
+      line-height: 38px;
+      margin: 0;
+      white-space: pre-line;
+    }
+    .footer-newsletter__form { display: flex; gap: 8px; align-items: center; }
+    .footer-newsletter__input {
+      padding: 16px;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 16px;
+      border: 1px solid #98a2b3;
+      border-radius: 4px;
+      width: 404px;
+      outline: none;
+      line-height: 24px;
+    }
+    .footer-newsletter__btn {
+      padding: 16px;
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 16px;
+      background: #fff;
+      border: 1px solid #98a2b3;
+      border-radius: 4px;
+      cursor: pointer;
+      line-height: 24px;
+    }
+    .footer-newsletter__btn:hover { background: #f9fafb; }
+    .footer-bottom {
+      background: #e9e9e9;
+      padding: 16px 80px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .footer-bottom__inner {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Roboto Slab', Georgia, serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #1d2939;
+      line-height: 24px;
+    }
+    /* ── CTA button (matches blog listing teal button) ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--teal);
+      color: #fff;
+      padding: 12px 22px;
+      font-family: var(--sans);
+      font-size: 15px;
+      text-decoration: none;
+      border-radius: 6px;
+      line-height: 24px;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--teal-dark); }
+    @media (max-width: 1100px) {
+      .nav__inner,
+      .subnav__inner,
+      .page-inner,
+      .footer-cols,
+      .footer-newsletter,
+      .footer-bottom { padding-left: 24px; padding-right: 24px; }
+      .footer-cols { flex-wrap: wrap; }
+    }
+    @media (max-width: 768px) {
+      .nav__menu,
+      .subnav__menu { display: none; }
+      .footer-col { width: 50%; flex: none; }
+      .footer-newsletter__row { flex-direction: column; gap: 24px; }
+      .footer-newsletter__input { width: 100%; }
+    }
+    /* ── Header/hero image sits in a flexbox module that shrink-wraps it tiny.
+       Switch that module to normal flow (no :has(), so it works on older iOS Safari)
+       and let the image span the content width. ── */
+    .widget_1781312074965-flexbox-positioning { display: block !important; }
+    .widget_1781312074965-flexbox-positioning .hs_cos_wrapper_type_linked_image,
+    .widget_1781312074965-flexbox-positioning .widget-type-linked_image { display: block !important; width: 100% !important; max-width: 100% !important; }
+    .widget_1781312074965-flexbox-positioning img { width: 100% !important; max-width: 960px !important; height: auto !important; display: block !important; margin: 0 auto !important; }
+    /* ── Responsive fixes for the drag-and-drop text blocks ──
+       Several content sections carry hard-coded desktop side paddings / fixed widths
+       in their inline styles (padding:0 390px, padding:0 80px, width:628px). Those
+       don't shrink on their own, so on tablet and mobile they squeeze the text into a
+       sliver and overflow off-screen. Collapse them to sensible gutters at narrow
+       widths. (These selectors only match those specific blocks — the cards use
+       different padding values and are unaffected.) */
+    @media (max-width: 1100px) {
+      [style*="0 390px"],
+      [style*="0 80px"] { padding-left: 24px !important; padding-right: 24px !important; }
+      [style*="628px"] { width: auto !important; max-width: 100% !important; }
+      /* Never let an image push a column wider than the screen */
+      .dnd-module img, .widget-span img { max-width: 100% !important; height: auto !important; }
+    }
+    @media (max-width: 820px) {
+      /* Audience illustrations are a hard-coded 224px wide — let them fill the column on
+         mobile so they scale up and line up with the text instead of floating small. */
+      .dnd-module img[width="224"] { width: 100% !important; height: auto !important; display: block; }
+      /* Stacked cards: the between-column dividers become stray vertical lines on mobile,
+         and the equal-height forces big gaps — drop both. */
+      [style*="border-left: 1px solid #e4e7ec"] { border-left: 0 !important; }
+      [style*="min-height: 225px"] { min-height: 0 !important; }
+      /* Kill the hard-coded 80px side paddings that shove the audience modules around. */
+      .dnd-section [style*="80px"] { padding-left: 16px !important; padding-right: 16px !important; }
+    }
+    @media (max-width: 600px) {
+      [style*="0 390px"],
+      [style*="0 80px"] { padding-left: 16px !important; padding-right: 16px !important; }
+    }
+    .cureus-aud{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2rem 1.5rem;width:100%;max-width:1280px;margin:0 auto;padding:0 1.5rem;box-sizing:border-box;}
+    .cureus-aud *{box-sizing:border-box;max-width:100%;}
+    .cureus-aud__img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;margin:0 0 1rem;background:#eef4f7;border-radius:0;}
+    .cureus-aud__num{font-family:'Inter',Arial,sans-serif;font-size:.7rem;font-weight:700;color:#1a9fbd;letter-spacing:.18em;text-transform:uppercase;margin:0 0 .5rem;}
+    .cureus-aud__title{font-family:'Roboto Slab',Georgia,serif;font-size:1.25rem;font-weight:600;color:#000;text-transform:uppercase;line-height:1.3;margin:0 0 .5rem;}
+    .cureus-aud__text{font-family:'Roboto Slab',Georgia,serif;font-size:1rem;color:#777;line-height:1.4;margin:0;}
+    @media (max-width:820px){.cureus-aud{grid-template-columns:1fr;}.cureus-aud__card{max-width:420px;margin-left:auto;margin-right:auto;}}
+  </style>
+</head>
+<body>
+{# ── NAV ROW 1: Primary menu (matches blog listing page) ─────────────────── #}
+{% set primary_menu = menu(213273198154) %}
+<nav class="nav" aria-label="Primary navigation">
+  <div class="nav__inner">
+    <!-- Cureus site logo, links to main site; sits left of the Home menu item -->
+    <a class="nav__logo" href="https://www.cureus.com" aria-label="Cureus" style="display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none;">
+      <img src="data:image/png;base64,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" alt="Cureus — Part of Springer Nature" style="height:44px;width:auto;display:block;">
+    </a>
+    <ul class="nav__menu">
+      {% for item in primary_menu.children %}
+        <li>
+          <a href="{{ item.url }}" class="nav__link">{{ item.label }}</a>
+          {% if item.children %}
+            <ul class="nav__dd">
+              {% for child in item.children %}
+                <li><a href="{{ child.url }}">{{ child.label }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="nav__right">
+      <a href="https://cta-service-cms2.hubspot.com/web-interactives/public/v1/track/redirect?encryptedPayload=AVxigLIUze30gran83%2F5iKfzAUPkH22WffugIDc64rInWoxdEWTq1PY7NqbW3OGhWgijdqvW8Ei2q4%2FTug5YDpSgw1Lwd744xWbQOKh0QZsdBVZlz34PoiyLHRXcJR4aW0m2xUYBMTu2pmNX28hhtOKDzJ9lAyLtpqtR2W7mj9KkDQsPvr1QOUtPOnVA32ChLxg%3D&amp;webInteractiveContentId=205845548937&amp;portalId=46589883" class="nav__cta" target="_blank" rel="noopener noreferrer" crossorigin="anonymous">Submit Research <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></a>
+    </div>
+  </div>
+</nav>
+{# ── NAV ROW 2: Secondary menu, right-aligned (matches blog listing sub-nav) ─────────────────── #}
+{% set secondary_menu = menu(213273197925) %}
+<nav class="subnav" aria-label="Blog navigation">
+  <div class="subnav__inner">
+    <ul class="subnav__menu">
+      {% for item in secondary_menu.children %}
+        <li>
+          <a href="{{ item.url }}" class="subnav__link">{{ item.label }}</a>
+          {% if item.children %}
+            <ul class="subnav__dd">
+              {% for child in item.children %}
+                <li><a href="{{ child.url }}">{{ child.label }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>
+{# ── Main Content (Drag & Drop) ──────────────────────────── #}
+{% dnd_area "main_dnd_area" label="Page Content" %}
+  {# PAGE TITLE #}
+  {% dnd_section padding={"default":{"top":"40px","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 80px;max-width:1440px;margin:0 auto;'><div style='border-bottom:1px solid #e4e7ec;display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:20px;'><h1 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:24px;font-weight:600;color:#000;text-align:center;text-transform:uppercase;letter-spacing:-0.64px;line-height:38px;margin:0;'>About the Cureus Journal of Medical Science Blog</h1><a href='#' style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;line-height:18px;text-decoration:none;'>MORE DETAILS</a></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# HERO IMAGE #}
+  {% dnd_section padding={"default":{"top":"16px","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/linked_image", offset=0, width=12,
+          img={"src":"https://via.placeholder.com/1280x400/d8eaf0/aaaaaa?text=Hero+Image","alt":"Cureus Blog hero image","loading":"eager","width":1280,"height":400}
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# INTRO TEXT + CTA #}
+  {% dnd_section padding={"default":{"top":"40px","bottom":"40px"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='max-width:1280px;margin:0 auto;padding:0 80px;display:flex;flex-direction:column;gap:40px;align-items:center;'><h2 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:48px;font-weight:600;color:#000;text-align:center;line-height:56px;margin:0;'>The Cureus Journal of Medical Science Blog shares practical publishing guidance, journal updates, community stories, and news from our journal.</h2><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;text-align:center;line-height:24px;margin:0;'>Cureus publishes peer-reviewed medical research from clinicians, researchers, educators, and healthcare professionals around the world. This blog was created to help authors, reviewers, editors, readers, and institutional partners better understand the publishing process, discover relevant Cureus resources, and stay informed about new opportunities across the journal.</p><a href='https://blog.cureus.com/' style='display:inline-flex;align-items:center;justify-content:center;background:#1a9fbd;color:#fff;padding:12px 22px;text-decoration:none;font-family:\"Inter\",Arial,sans-serif;font-size:15px;border-radius:6px;line-height:24px;'>Explore the Blog</a></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# WHAT YOU'LL FIND HERE — heading #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 80px;max-width:1440px;margin:0 auto;'><div style='border-top:1px solid #e4e7ec;border-bottom:1px solid #e4e7ec;display:flex;flex-direction:column;align-items:center;gap:8px;padding:40px 0 20px;'><h2 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:32px;font-weight:600;color:#000;text-align:center;text-transform:uppercase;line-height:38px;margin:0;'>What You&rsquo;ll Find Here</h2><p style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;line-height:18px;text-align:center;margin:0;'>This blog brings together practical resources, journal updates, community-focused stories,<br>and media coverage related to Cureus and medical publishing.</p></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# WHAT YOU'LL FIND HERE — 4 cards #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=3,
+          html="<div style='padding:20px 16px 20px 80px;display:flex;flex-direction:column;gap:16px;'><div style='font-size:36px;line-height:1;'>📋</div><h3 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:24px;font-weight:600;color:#000;line-height:32px;margin:0;'>Publishing Guidance</h3><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>Practical resources for authors, reviewers, guest editors, and Cureus Channel members.</p><div style='display:flex;gap:8px;align-items:center;'><a href='#' style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;text-decoration:none;'>view details</a><span style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;color:#777;'>&gt;</span></div></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=3, width=3,
+          html="<div style='padding:20px 16px;border-left:1px solid #e4e7ec;display:flex;flex-direction:column;gap:16px;'><div style='font-size:36px;line-height:1;'>⚡</div><h3 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:24px;font-weight:600;color:#000;line-height:32px;margin:0;'>Cureus Updates</h3><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>Journal news, platform improvements, new programs, and publishing opportunities.</p><div style='display:flex;gap:8px;align-items:center;'><a href='#' style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;text-decoration:none;'>view details</a><span style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;color:#777;'>&gt;</span></div></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=6, width=3,
+          html="<div style='padding:20px 16px;border-left:1px solid #e4e7ec;display:flex;flex-direction:column;gap:16px;'><div style='font-size:36px;line-height:1;'>👥</div><h3 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:24px;font-weight:600;color:#000;line-height:32px;margin:0;'>Community Stories</h3><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>Stories featuring the people, institutions, and organizations advancing medical research through the Cureus community.</p><div style='display:flex;gap:8px;align-items:center;'><a href='#' style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;text-decoration:none;'>view details</a><span style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;color:#777;'>&gt;</span></div></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=9, width=3,
+          html="<div style='padding:20px 80px 20px 16px;border-left:1px solid #e4e7ec;display:flex;flex-direction:column;gap:16px;'><div style='font-size:36px;line-height:1;'>📣</div><h3 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:24px;font-weight:600;color:#000;line-height:32px;margin:0;'>Cureus in the Media</h3><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>Press mentions and coverage of research published in the journal.</p><div style='display:flex;gap:8px;align-items:center;'><a href='#' style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;text-decoration:none;'>view details</a><span style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;color:#777;'>&gt;</span></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# WHO THE BLOG IS FOR — heading #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 80px;max-width:1440px;margin:0 auto;'><div style='border-top:1px solid #e4e7ec;display:flex;flex-direction:column;align-items:center;padding:40px 0 20px;'><h2 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:32px;font-weight:600;color:#000;text-align:center;text-transform:uppercase;line-height:38px;margin:0;'>Who the Cureus Blog is For</h2></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# WHO THE BLOG IS FOR — intro text #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 80px;max-width:1440px;margin:0 auto;'><div style='border-bottom:1px solid #e4e7ec;display:flex;flex-direction:column;gap:24px;align-items:center;justify-content:center;padding:40px 0 20px;'><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:32px;font-weight:600;color:#000;text-align:center;line-height:38px;margin:0;'>The Cureus Journal of Medical Science Blog is intended for anyone who wants to better understand Cureus, explore research and updates from the journal, and stay informed about publishing resources, programs, and opportunities.</p></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# WHO THE BLOG IS FOR — 5 audience cards (one row: image on top, text underneath) #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"20px"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=2,
+          html="<div><img src='https://blog.cureus.com/hs-fs/hubfs/07.08.2026_About-this-Blog-page_landingpage_Author.png' alt='Authors' style='width:100%;height:auto;display:block;margin:0 0 16px;'><div style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px;'>1</div><h4 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:22px;font-weight:600;color:#000;text-transform:uppercase;line-height:28px;margin:0 0 8px;'>Authors</h4><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>preparing or managing submissions</p></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=2, width=2,
+          html="<div><img src='https://blog.cureus.com/hs-fs/hubfs/07.08.2026_About-this-Blog-page_landingpage_Reviewer.png' alt='Reviewers' style='width:100%;height:auto;display:block;margin:0 0 16px;'><div style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px;'>2</div><h4 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:22px;font-weight:600;color:#000;text-transform:uppercase;line-height:28px;margin:0 0 8px;'>Reviewers</h4><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>supporting the peer review process</p></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=4, width=2,
+          html="<div><img src='https://blog.cureus.com/hs-fs/hubfs/07.08.2026_About-this-Blog-page_landingpage_Student.png' alt='Readers' style='width:100%;height:auto;display:block;margin:0 0 16px;'><div style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px;'>3</div><h4 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:22px;font-weight:600;color:#000;text-transform:uppercase;line-height:28px;margin:0 0 8px;'>Readers</h4><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>looking for relevant medical research</p></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=6, width=2,
+          html="<div><img src='https://blog.cureus.com/hs-fs/hubfs/07.08.2026_About-this-Blog-page_landingpage_Guest-Editor.png' alt='Editors' style='width:100%;height:auto;display:block;margin:0 0 16px;'><div style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px;'>4</div><h4 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:22px;font-weight:600;color:#000;text-transform:uppercase;line-height:28px;margin:0 0 8px;'>Editors</h4><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>guest editors, associate editors, and editorial board members</p></div>"
+        %}{% end_dnd_module %}
+        {% dnd_module path="@hubspot/rich_text", offset=8, width=2,
+          html="<div><img src='https://blog.cureus.com/hs-fs/hubfs/07.08.2026_About-this-Blog-page_landingpage_Channel.png' alt='Channel Members' style='width:100%;height:auto;display:block;margin:0 0 16px;'><div style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;letter-spacing:.18em;text-transform:uppercase;margin:0 0 8px;'>5</div><h4 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:22px;font-weight:600;color:#000;text-transform:uppercase;line-height:28px;margin:0 0 8px;'>Channel Members</h4><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:18px;color:#777;line-height:24px;margin:0;'>members of academic or commercial channels</p></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# HOW THE BLOG SUPPORTS — heading #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 80px;max-width:1440px;margin:0 auto;'><div style='border-top:1px solid #e4e7ec;display:flex;flex-direction:column;align-items:center;gap:8px;padding:40px 0 20px;'><h2 style='font-family:\"Roboto Slab\",Georgia,serif;font-size:32px;font-weight:600;color:#000;text-align:center;text-transform:uppercase;letter-spacing:-0.64px;line-height:38px;margin:0;'>How the Blog Supports the Cureus Community</h2><a href='#' style='font-family:\"Inter\",Arial,sans-serif;font-size:11px;font-weight:700;color:#1a9fbd;text-transform:uppercase;letter-spacing:.18em;line-height:18px;text-decoration:none;'>more details</a></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# HOW THE BLOG SUPPORTS — body text #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 390px;max-width:1440px;margin:0 auto;'><div style='border-top:1px solid #e4e7ec;display:flex;align-items:center;justify-content:center;padding:40px 0 20px;'><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:32px;font-weight:600;color:#000;text-align:center;line-height:38px;margin:0;'>The Cureus Blog is intended to support the medical publishing community by making our journal and platform easier to understand and navigate. Blog content may discuss publishing workflows, editorial and marketing initiatives, institutional programs, and broader topics in medical publishing.</p></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+  {# FINAL CTA #}
+  {% dnd_section padding={"default":{"top":"0","bottom":"0"}} %}
+    {% dnd_column offset=0, width=12 %}
+      {% dnd_row %}
+        {% dnd_module path="@hubspot/rich_text", offset=0, width=12,
+          html="<div style='padding:0 390px;max-width:1440px;margin:0 auto;'><div style='border-top:1px solid #e4e7ec;display:flex;flex-direction:column;gap:24px;align-items:center;justify-content:center;padding:40px 0;'><p style='font-family:\"Roboto Slab\",Georgia,serif;font-size:32px;font-weight:600;color:#000;text-align:center;line-height:38px;margin:0;width:628px;'>Ready to explore helpful resources, updates, and stories?</p><a href='https://blog.cureus.com/' style='display:inline-flex;align-items:center;justify-content:center;background:#1a9fbd;color:#fff;padding:12px 22px;text-decoration:none;font-family:\"Inter\",Arial,sans-serif;font-size:15px;border-radius:6px;line-height:24px;'>Explore the Blog</a></div></div>"
+        %}{% end_dnd_module %}
+      {% end_dnd_row %}
+    {% end_dnd_column %}
+  {% end_dnd_section %}
+{% end_dnd_area %}
+{# ── Footer ── #}
+<div class="site-footer" style="background:#f4f4f4;border-top:1px solid #e4e7ec;">
+  <div style="display:flex;padding:0 80px;max-width:1440px;margin:0 auto;">
+    <div style="flex:1;padding:16px 16px 20px 0;border-right:1px solid #e4e7ec;">
+      <h4 style="font-family:'Roboto Slab',Georgia,serif;font-size:20px;font-weight:600;color:#000;line-height:32px;margin:20px 0 16px;">Published Content</h4>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://www.cureus.com/specialties" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Specialties</a>
+        <a href="https://www.cureus.com/articles" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Articles</a>
+        <a href="https://www.cureus.com/posters" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Posters</a>
+        <a href="https://www.cureus.com/abstracts" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Abstracts</a>
+        <a href="https://www.cureus.com/collections" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Collections</a>
+        <a href="https://www.cureus.com/channels/all" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Channels</a>
+        <a href="https://www.cureus.com/competitions/past_competitions" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Competitions</a>
+      </div>
+    </div>
+    <div style="flex:1;padding:16px;border-right:1px solid #e4e7ec;">
+      <h4 style="font-family:'Roboto Slab',Georgia,serif;font-size:20px;font-weight:600;color:#000;line-height:32px;margin:20px 0 16px;">Resources</h4>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://www.cureus.com/guides" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Cureus Guides</a>
+        <a href="https://www.cureus.com/honors" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Cureus Honors</a>
+        <a href="https://www.cureus.com/cureus_editing_services" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Author Fees</a>
+        <a href="https://www.cureus.com/siq" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">SIQ</a>
+        <a href="https://www.cureus.com/article_promotion" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Article Promotion</a>
+        <a href="https://www.cureus.com/advertising" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Advertising Policy</a>
+        <a href="https://www.cureus.com/ads_sponsorship" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Advertise With Us</a>
+        <a href="https://www.cureus.com/privacy" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Privacy Policy</a>
+        <a href="https://www.springernature.com/gp/legal/us-state-privacy-rights" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">US State Privacy Rights</a>
+        <a href="https://www.cureus.com/terms" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Terms of Use</a>
+        <a href="https://www.cureus.com/faq" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">FAQ</a>
+      </div>
+    </div>
+    <div style="flex:1;padding:16px;border-right:1px solid #e4e7ec;">
+      <h4 style="font-family:'Roboto Slab',Georgia,serif;font-size:20px;font-weight:600;color:#000;line-height:32px;margin:20px 0 16px;">About Us</h4>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://www.cureus.com/about" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">About Cureus</a>
+        <a href="https://www.cureus.com/editorial_board" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Editorial Board</a>
+        <a href="https://www.cureus.com/associate_editors" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Associate Editors</a>
+        <a href="https://www.cureus.com/about_publishing" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">About Publishing</a>
+        <a href="https://www.cureus.com/about_peer_review" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">About Peer Review</a>
+        <a href="https://www.cureus.com/channels" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">About Channels</a>
+        <a href="https://www.cureus.com/about_collections" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">About Collections</a>
+        <a href="https://www.cureus.com/competitions" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">About Competitions</a>
+        <a href="https://www.cureus.com/partnerships" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Partnerships</a>
+        <a href="https://www.cureus.com/careers" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Careers</a>
+        <a href="https://www.cureus.com/sitemap" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Sitemap</a>
+      </div>
+    </div>
+    <div style="flex:1;padding:16px 0 20px 16px;">
+      <h4 style="font-family:'Roboto Slab',Georgia,serif;font-size:20px;font-weight:600;color:#000;line-height:32px;margin:20px 0 16px;">Stay Connected</h4>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://www.cureus.com/contact" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Contact Us</a>
+        <a href="https://www.cureus.com/email_preferences" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Emails and Alerts</a>
+        <a href="https://www.linkedin.com/company/cureus/" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">LinkedIn</a>
+        <a href="https://www.facebook.com/CureusJournalofMedicalScience/" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Facebook</a>
+        <a href="https://x.com/cureusmedical" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">X</a>
+        <a href="https://www.instagram.com/cureusmedical/" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Instagram</a>
+        <a href="https://www.youtube.com/channel/UCtJKOEpL-TGVsq-u8H3sPzQ" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">Youtube</a>
+        <a href="https://bsky.app/profile/cureusmedical.bsky.social" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">BlueSky</a>
+        <a href="https://www.tiktok.com/@cureusmedical" style="font-family:'Roboto Slab',Georgia,serif;font-size:16px;font-weight:500;color:#73797e;text-decoration:none;line-height:24px;">TikTok</a>
+      </div>
+    </div>
+  </div>
+</div>
+{# ── Newsletter + Bottom bar (static) ───────────────────── #}
+<div style="background:#e9e9e9;">
+  <div style="padding:0 80px;max-width:1440px;margin:0 auto;">
+    <div style="border-top:1px solid #e4e7ec;border-bottom:1px solid #e4e7ec;display:flex;align-items:flex-end;justify-content:space-between;padding:40px 0 20px;">
+      <h3 style="font-family:'Roboto Slab',Georgia,serif;font-size:24px;font-weight:600;color:#000;text-transform:uppercase;letter-spacing:.02em;line-height:30px;margin:0;max-width:560px;">Subscribe to our newsletter for all the latest news and updates</h3>
+      <form class="newsletter__form" data-hsform style="display:flex;gap:8px;align-items:center;">
+        <input type="email" name="email" required placeholder="Enter your email address" style="padding:16px;font-family:'Inter',Arial,sans-serif;font-size:16px;border:1px solid #98a2b3;border-radius:4px;width:404px;outline:none;line-height:24px;">
+        <button type="submit" style="padding:16px;font-family:'Inter',Arial,sans-serif;font-size:16px;background:#1a9fbd;color:#fff;border:1px solid #1a9fbd;border-radius:4px;cursor:pointer;line-height:24px;">Subscribe</button>
+      </form>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'Inter','Helvetica Neue',Arial,sans-serif;font-size:13px;color:#6b7278;line-height:24px;padding:16px 0;">
+      <span>ISSN: 2168-8184</span>
+      <span>Public user content licensed CC-BY 4.0</span>
+      <span>CUREUS&reg; is a registered trademark of Cureus, Inc. in the United States.</span>
+    </div>
+  </div>
+</div>
+<script>
+  /* Newsletter -> submits to the HubSpot form's API, which records a real form
+     submission (so form-triggered workflows still fire). Portal 46589883, form 4969c11e-... */
+  (function(){
+    var ENDPOINT='https://api.hsforms.com/submissions/v3/integration/submit/46589883/4969c11e-c011-42c4-a1e1-3878c72f7aa2';
+    document.querySelectorAll('form[data-hsform]').forEach(function(f){
+      f.addEventListener('submit', function(e){
+        e.preventDefault();
+        var input=f.querySelector('input[type="email"]');
+        var email=input?input.value.trim():'';
+        if(!email) return;
+        var btn=f.querySelector('button');
+        if(btn){ btn.disabled=true; btn.textContent='Subscribing…'; }
+        var hutk=(document.cookie.match(/hubspotutk=([^;]+)/)||[])[1];
+        var ctx={ pageUri:location.href, pageName:document.title };
+        if(hutk){ ctx.hutk=hutk; }
+        fetch(ENDPOINT,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ fields:[{name:'email',value:email}], context:ctx })
+        }).then(function(r){
+          if(r.ok){
+            f.innerHTML='<span style="font-family:\'Inter\',\'Helvetica Neue\',Arial,sans-serif;font-size:15px;font-weight:500;color:#1a9fbd;">Thanks — you\'re subscribed!</span>';
+          } else {
+            if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
+            r.json().then(function(d){ alert((d&&d.message)||'Sorry, something went wrong. Please try again.'); }).catch(function(){ alert('Sorry, something went wrong. Please try again.'); });
+          }
+        }).catch(function(){
+          if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
+          alert('Network error. Please try again.');
+        });
+      });
+    });
+  })();
+</script>
+<script>
+  /* Footer links open in a new tab */
+  (function(){
+    document.querySelectorAll('.site-footer a[href^="http"]').forEach(function(a){
+      a.setAttribute('target','_blank');
+      a.setAttribute('rel','noopener noreferrer');
+    });
+  })();
+</script>
+<!-- Mobile navigation (hamburger) — builds a mobile menu from the existing nav on small screens -->
+<style>
+  .nav__toggle{ display:none; align-items:center; justify-content:center; width:42px; height:42px; padding:0; border:1px solid var(--line); border-radius:8px; background:#fff; color:#2b3137; cursor:pointer; }
+  .nav__toggle svg{ display:block; }
+  #cureusMobileMenu{ display:none; border-bottom:1px solid var(--line); background:#fff; }
+  #cureusMobileMenu.is-open{ display:block; }
+  #cureusMobileMenu ul{ list-style:none; margin:0; padding:8px 0; }
+  #cureusMobileMenu a{ display:block; padding:11px 24px; font-family:var(--sans); font-size:15px; color:#2b3137; text-decoration:none; }
+  #cureusMobileMenu a:hover{ background:#f5fafc; color:var(--teal); }
+  #cureusMobileMenu a.is-child{ padding-left:44px; font-size:14px; color:#52606b; }
+  #cureusMobileMenu .sep{ height:1px; background:var(--line); margin:6px 0; }
+  @media (max-width:820px){
+    .nav__menu, .subnav__menu{ display:none !important; }
+    .nav__toggle{ display:inline-flex; }
+    .nav__right{ margin-left:auto; }
+  }
+</style>
+<script>
+(function(){
+  function init(){
+    var navInner=document.querySelector('.nav__inner');
+    if(!navInner||document.querySelector('.nav__toggle'))return;
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='nav__toggle';btn.setAttribute('aria-label','Menu');btn.setAttribute('aria-expanded','false');
+    btn.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+    navInner.insertBefore(btn,navInner.firstChild);
+    var panel=document.createElement('nav');panel.id='cureusMobileMenu';panel.setAttribute('aria-label','Mobile menu');
+    var ul=document.createElement('ul');
+    function addLink(a,child){if(!a)return;var li=document.createElement('li');var na=document.createElement('a');na.href=a.getAttribute('href')||'#';na.textContent=(a.textContent||'').trim();if(child)na.className='is-child';li.appendChild(na);ul.appendChild(li);}
+    function addMenu(menu,ddSel){if(!menu)return;menu.querySelectorAll(':scope > li').forEach(function(li){addLink(li.querySelector(':scope > a'),false);var dd=li.querySelector(ddSel);if(dd){dd.querySelectorAll('li > a').forEach(function(ca){addLink(ca,true);});}});}
+    addMenu(document.querySelector('.nav__menu'),'.nav__dd');
+    var sub=document.querySelector('.subnav__menu');
+    if(sub&&sub.querySelector('li')){var sep=document.createElement('li');sep.innerHTML='<div class="sep"></div>';ul.appendChild(sep);addMenu(sub,'.subnav__dd');}
+    panel.appendChild(ul);
+    var anchor=document.querySelector('.subnav')||document.querySelector('.nav');
+    anchor.parentNode.insertBefore(panel,anchor.nextSibling);
+    btn.addEventListener('click',function(){var open=panel.classList.toggle('is-open');btn.setAttribute('aria-expanded',open?'true':'false');});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<script>
+/* Link target policy: menu links and links that stay within the blog (reading a post,
+   category/tag pages, pagination, search) open in the SAME tab. Every link that leaves
+   the blog — the main Cureus site, the logo, footer, social, external references — opens
+   in a NEW tab so the blog stays open. */
+(function(){
+  var host = location.hostname;
+  function inMenu(a){
+    return a.closest('.nav__menu') || a.closest('.subnav__menu') || a.closest('#cureusMobileMenu');
+  }
+  function apply(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      if (a.dataset.tabDone) return;
+      if (inMenu(a)) { a.dataset.tabDone='1'; return; }            // menu links: same tab
+      var raw = a.getAttribute('href') || '';
+      if (!raw || raw.charAt(0)==='#' || /^(javascript:|mailto:|tel:)/i.test(raw)) { a.dataset.tabDone='1'; return; }
+      var url; try { url = new URL(a.href, location.href); } catch(e){ a.dataset.tabDone='1'; return; }
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') { a.dataset.tabDone='1'; return; }
+      // Leaves the blog when: different host, OR footer link, OR the site logo.
+      var leavesBlog = (url.hostname !== host) || !!a.closest('.site-footer') || a.classList.contains('nav__logo');
+      if (leavesBlog) { a.setAttribute('target','_blank'); a.setAttribute('rel','noopener noreferrer'); }
+      a.dataset.tabDone='1';
+    });
+  }
+  apply();
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', apply);
+  window.addEventListener('load', apply);   // catch the mobile menu built on load
+})();
+</script>
+
+{{ standard_footer_includes }}
+</body>
+</html>
