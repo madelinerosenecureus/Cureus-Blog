@@ -1,0 +1,812 @@
+<!--
+  templateType: blog_listing
+  isAvailableForNewContent: true
+  label: Cureus Blog Listing Page
+-->
+<!DOCTYPE html>
+<html lang="{{ html_lang }}" {{ html_lang_dir }}>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_meta.html_title }}</title>
+  <meta name="description" content="{{ page_meta.meta_description }}">
+  {{ standard_header_includes }}
+  {# Site fonts: Roboto Slab (headings) + Inter (body), both from Google Fonts. #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts (Inter + Roboto Slab) are self-declared via @font-face in the CSS below.
+       The Google Fonts stylesheet link was removed because its subset-based faces
+       conflicted with and blocked reliable loading on this page. -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    /* Direct @font-face — loads the full variable fonts reliably. Google Fonts' lazy per-weight
+       loading intermittently fails to apply on some HubSpot pages, so we declare the faces here. */
+    @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2');}
+    @font-face{font-family:'Roboto Slab';font-style:normal;font-weight:100 900;font-display:swap;src:url('https://fonts.gstatic.com/s/robotoslab/v36/BngMUXZYTXPIvIBgJJSb6ufN5qWr4xCC.woff2') format('woff2');}
+    :root{
+      --teal:#1a9fbd;          /* primary accent */
+      --teal-dark:#127f99;
+      --ink:#000;              /* headings (match About page) */
+      --body:#475158;          /* body text */
+      --muted:#8a929a;         /* meta/dates */
+      --line:#e7ebee;          /* hairlines */
+      --serif: 'Roboto Slab', Georgia, 'Times New Roman', serif;  /* headings */
+      --sans:'Inter','Helvetica Neue',Arial,sans-serif;          /* body */
+      --maxw:1280px;
+      --grad: radial-gradient(120% 120% at 30% 25%, #bfe6f4 0%, #66bfdf 45%, #1f9ad0 100%);
+      --grad-soft: linear-gradient(135deg,#e6f3fa 0%, #d2ebf6 100%);
+    }
+    body { margin:0; font-family:var(--sans); color:var(--body); background:#fff; -webkit-font-smoothing:antialiased; }
+    a{ color:inherit; }
+    img{ border-radius:0 !important; } /* all images render with square corners */
+    .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 40px; }
+
+    /* ───────────────────────── NAV ───────────────────────── */
+    .nav{ border-bottom:1px solid var(--line); background:#fff; }
+    .nav__inner{ display:flex; align-items:center; gap:28px; max-width:var(--maxw); margin:0 auto; padding:18px 40px; }
+    .nav__menu{ display:flex; align-items:center; gap:26px; list-style:none; margin:0; padding:0; flex:1; }
+    .nav__menu > li{ position:relative; }
+    .nav__link{ font-size:15px; color:#73797e; text-decoration:none; white-space:nowrap; }
+    .nav__link:hover{ color:var(--teal); }
+    .nav__menu > li:hover .nav__dd{ display:block; }
+    /* Transparent bridge across the 14px gap so the dropdown stays open while the cursor moves onto it */
+    .nav__dd::before{ content:""; position:absolute; left:0; right:0; top:-14px; height:14px; }
+    .nav__dd{ display:none; position:absolute; top:100%; left:0; margin-top:14px; background:#fff; border:1px solid var(--line);
+      list-style:none; padding:6px 0; min-width:210px; z-index:200; box-shadow:0 10px 30px rgba(20,40,60,.10); border-radius:8px; }
+    .nav__dd li a{ display:block; padding:9px 18px; font-size:14px; color:#2b3137; text-decoration:none; }
+    .nav__dd li a:hover{ background:#f5fafc; color:var(--teal); }
+    .nav__right{ display:flex; align-items:center; gap:18px; }
+    .nav__cta{ display:inline-flex; align-items:center; gap:10px; background:#0096b7; color:#fff; text-decoration:none; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:normal; padding:13px 16px; border-radius:8px; white-space:nowrap; }
+    .nav__cta svg{ flex-shrink:0; }
+    .nav__cta:hover{ background:#007e99; }
+    .nav__avatar{ width:40px; height:40px; border-radius:50%; background:var(--grad); flex-shrink:0; display:block; object-fit:cover; }
+
+    /* blog sub-nav (second row, opposite side from main menu) */
+    .subnav{ border-bottom:1px solid var(--line); background:#fff; }
+    .subnav__inner{ display:flex; justify-content:center; max-width:var(--maxw); margin:0 auto; padding:0 40px; }
+    .subnav__menu{ display:flex; align-items:center; gap:22px; list-style:none; margin:0; padding:0; }
+    .subnav__menu > li{ position:relative; }
+    .subnav__link{ display:flex; align-items:center; height:48px; font-size:14px; color:#52606b; text-decoration:none; white-space:nowrap; }
+    .subnav__link:hover{ color:var(--teal); }
+    .subnav__menu > li:hover .subnav__dd{ display:block; }
+    .subnav__dd{ display:none; position:absolute; top:100%; right:0; background:#fff; border:1px solid var(--line); list-style:none;
+      margin:0; padding:6px 0; min-width:220px; z-index:200; box-shadow:0 10px 30px rgba(20,40,60,.10); border-radius:8px; }
+    .subnav__dd li a{ display:block; padding:9px 18px; font-size:14px; color:#2b3137; text-decoration:none; }
+    .subnav__dd li a:hover{ background:#f5fafc; color:var(--teal); }
+
+    /* ───────────────────────── HERO ───────────────────────── */
+    /* No horizontal padding here — the inner .wrap supplies the 40px gutter so the
+       hero/search width lines up exactly with the content columns below. */
+    .hero{ text-align:center; padding:46px 0 0; }
+    .hero__title{ font-family:var(--serif); font-weight:600; color:var(--ink); font-size:24px; line-height:38px; letter-spacing:-0.02em; text-transform:uppercase; margin:0; }
+    .hero__eyebrow{ color:var(--teal); font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; margin:10px 0 0; }
+
+    .hero__card{ position:relative; margin:26px auto 0; border-radius:0; background:var(--grad-soft);
+      padding:78px 30px 86px; overflow:hidden; }
+    .hero__card h2{ font-family:var(--serif); font-weight:600; color:#000; font-size:24px; line-height:32px; margin:0; }
+    .hero__card p{ color:#5a6b78; font-size:18px; margin:18px auto 0; max-width:620px; line-height:1.6; }
+
+    /* search / results bar */
+    .searchbar{ display:flex; align-items:center; gap:14px; border:1px solid #d9dee2; border-radius:0;
+      background:#fff; padding:10px 12px 10px 18px; margin:22px auto 0; box-shadow:0 1px 2px rgba(20,40,60,.04); }
+    .searchbar__icon{ color:#9aa2a9; flex-shrink:0; display:flex; }
+    .searchbar input{ flex:1; border:none; outline:none; font-family:inherit; font-size:15px; color:#333; min-width:0; background:transparent; }
+    .searchbar input::placeholder{ color:#9aa2a9; font-style:italic; }
+    .searchbar__count{ font-size:12px; color:#8a929a; letter-spacing:.04em; white-space:nowrap; }
+    .searchbar__count b{ color:#5a6b78; font-weight:600; }
+    .btn-filters{ display:inline-flex; align-items:center; gap:8px; background:var(--teal); color:#fff; border:none;
+      font-family:inherit; font-size:13px; font-weight:600; letter-spacing:.04em; padding:11px 18px; border-radius:7px; cursor:pointer; white-space:nowrap; }
+    .btn-filters:hover{ background:var(--teal-dark); }
+    .filters-wrap{ position:relative; }
+    .filters-wrap:hover .filters-dd, .filters-wrap:focus-within .filters-dd{ display:block; }
+    .filters-dd{ display:none; position:absolute; top:100%; left:0; margin-top:8px; background:#fff; border:1px solid var(--line);
+      list-style:none; padding:6px 0; min-width:220px; z-index:200; box-shadow:0 10px 30px rgba(20,40,60,.10); border-radius:8px; text-align:left; }
+    .filters-dd li a{ text-align:left; }
+    .filters-dd li a{ display:block; padding:9px 18px; font-size:14px; color:#2b3137; text-decoration:none; }
+    .filters-dd li a:hover{ background:#f5fafc; color:var(--teal); }
+    .btn-search{ background:#fff; border:1px solid #d9dee2; color:#2b3137; font-family:inherit; font-size:14px;
+      padding:10px 20px; border-radius:7px; cursor:pointer; }
+    .btn-search:hover{ border-color:var(--teal); color:var(--teal); }
+    .btn-x{ background:#fff; border:1px solid #d9dee2; color:#6b7178; width:40px; height:40px; border-radius:7px;
+      cursor:pointer; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center; }
+    .btn-x:hover{ border-color:var(--teal); color:var(--teal); }
+
+    /* ─────────────── FEATURED CAROUSEL ─────────────── */
+    .featured{ margin:30px auto 0; border:1px solid var(--line); border-radius:0; overflow:hidden; display:flex; height:390px;
+      box-shadow:0 6px 24px rgba(20,40,60,.06); }
+    .featured__img{ width:46%; min-height:330px; background:#fff; flex-shrink:0; position:relative; }
+    .featured__img img{ width:100%; height:100%; object-fit:cover; display:block; }
+    /* carousel image slides (stacked, cross-fade) */
+    .featured__slide-img{ position:absolute; inset:0; display:block; opacity:0; transition:opacity .35s ease; pointer-events:none; }
+    .featured__slide-img.is-active{ opacity:1; pointer-events:auto; }
+    .featured__slide-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .featured__body{ flex:1; padding:48px 52px; display:flex; flex-direction:column; min-height:0; }
+    /* text area grows to fill and scrolls if the post is long, so controls stay pinned to the bottom */
+    .featured__slides{ flex:1 1 auto; min-height:0; overflow:hidden; }
+    /* carousel text slides (show active only) */
+    .featured__slide{ display:none; }
+    .featured__slide.is-active{ display:block; }
+    /* Title is never truncated — it may use as many lines as it needs; the excerpt below
+       gives up space for it (see the clampExcerpt() logic in the carousel script). */
+    .featured__title{ font-family:var(--serif); font-weight:600; color:var(--ink); font-size:20px; line-height:26px; letter-spacing:.02em; margin:0; max-width:380px; }
+    .featured__title a{ text-decoration:none; color:inherit; }
+    .featured__title a:hover{ color:var(--teal); }
+    /* Clamp every excerpt to 4 lines with a trailing ellipsis so long meta descriptions
+       and short summaries render identically — no scroll bar, consistent height. */
+    /* Base clamp is 4 lines; the carousel script narrows it further per-slide when a long
+       title needs the room, so the excerpt always ends in a clean ellipsis (never a mid-line cut). */
+    .featured__excerpt{ color:var(--body); font-size:18px; line-height:1.75; margin:16px 0 20px; max-width:430px;
+      display:-webkit-box; -webkit-line-clamp:5; line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; }
+    .featured__controls{ display:flex; align-items:center; gap:26px; margin-top:20px; flex-shrink:0; }
+    .carousel-arrows{ display:flex; gap:14px; }
+    .carousel-arrow{ width:44px; height:44px; border-radius:50%; border:1px solid #d4dade; background:#fff; color:#4a5560;
+      display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; }
+    .carousel-arrow:hover{ border-color:var(--teal); color:var(--teal); }
+    .carousel-dots{ display:flex; gap:9px; align-items:center; }
+    .carousel-dot{ width:8px; height:8px; border-radius:50%; background:#d2d8dd; border:none; padding:0; cursor:pointer; transition:background .2s ease; }
+    .carousel-dot:hover{ background:#a8b1b8; }
+    .carousel-dot.is-active{ background:var(--teal); }
+    .btn-readmore{ margin-left:auto; align-self:flex-start; border:1px solid #d4dade; background:#fff; color:#2b3137;
+      text-decoration:none; font-size:14px; padding:11px 22px; border-radius:7px; }
+    .btn-readmore:hover{ border-color:var(--teal); color:var(--teal); }
+
+    /* ─────────────── SECTIONS ─────────────── */
+    /* Full-width divider between stacked sections (Knowledge / Community / News) */
+    .section{ margin-top:40px; padding-top:40px; border-top:1px solid var(--line); }
+    .section__head{ display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:26px; padding-bottom:20px; border-bottom:1px solid var(--line); }
+    .section__title{ font-family:var(--serif); font-weight:600; color:var(--ink); font-size:24px; line-height:30px; letter-spacing:.04em; text-transform:uppercase; margin:0; }
+    .section__sub{ color:var(--teal); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; margin:9px 0 0; }
+    .btn-viewall{ flex-shrink:0; display:inline-flex; align-items:center; gap:8px; border:1px solid #d4dade; background:#fff;
+      color:#2b3137; text-decoration:none; font-size:14px; padding:10px 20px; border-radius:7px; white-space:nowrap; }
+    .btn-viewall:hover{ border-color:var(--teal); color:var(--teal); }
+
+    /* card grid */
+    .cards{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:26px; }
+    .card{ display:flex; flex-direction:column; }
+    .card__img{ width:100%; aspect-ratio:1200/630; border-radius:0; background:var(--grad); object-fit:cover; display:block; }
+    .card__meta{ display:flex; align-items:center; gap:10px; margin:16px 0 8px; flex-wrap:wrap; }
+    .card__tag{ color:var(--teal); font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+    .card__tag--open{ color:#1f9ad0; }
+    .card__date{ color:var(--muted); font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+    .card__title{ font-family:var(--serif); font-weight:600; color:var(--ink); font-size:20px; line-height:26px; margin:0; }
+    .card__title a{ text-decoration:none; color:inherit; }
+    .card__title a:hover{ color:var(--teal); }
+    .card__stats{ display:flex; align-items:center; gap:22px; margin-top:auto; padding-top:16px; }
+    .stat{ display:flex; align-items:center; gap:7px; color:var(--muted); font-size:12px; }
+    .stat svg{ flex-shrink:0; }
+
+    /* community asymmetric layout */
+    .cards--community{ grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); align-items:stretch; }
+    .card--wide .card__img{ aspect-ratio:1200/630; }
+    .card--wide .card__title{ font-size:20px; line-height:1.3; }
+    .card--wide .card__meta{ margin-top:18px; }
+
+    /* Vertical hairline dividers between cards (magazine style, like cureus.com) — desktop only */
+    @media (min-width:1000px){
+      .cards > .card{ position:relative; }
+      .cards > .card + .card::before{
+        content:""; position:absolute; top:0; bottom:0; left:-13px; width:1px; background:var(--line);
+      }
+    }
+
+    /* ─────────────── NEWSLETTER + FOOTER ─────────────── */
+    .site-footer{ background:#f4f5f6; border-top:1px solid var(--line); margin-top:70px; }
+    .footer-cols{ display:flex; max-width:var(--maxw); margin:0 auto; padding:46px 40px 30px; gap:0; }
+    .footer-col{ flex:1; padding:0 28px; border-right:1px solid #e2e5e8; }
+    .footer-col:first-child{ padding-left:0; }
+    .footer-col:last-child{ border-right:none; padding-right:0; }
+    .footer-col h4{ font-family:var(--serif); font-size:20px; font-weight:600; color:#000; margin:0 0 16px; }
+    .footer-col a{ display:block; font-family:var(--serif); font-size:16px; font-weight:500; color:#73797e; text-decoration:none; margin-bottom:10px; }
+    .footer-col a:hover{ color:var(--teal); }
+
+    .newsletter{ border-top:1px solid #e2e5e8; }
+    .newsletter__inner{ max-width:var(--maxw); margin:0 auto; padding:34px 40px; display:flex; align-items:center; justify-content:space-between; gap:30px; flex-wrap:wrap; }
+    .newsletter__title{ font-family:var(--serif); font-weight:600; color:#000; font-size:24px; line-height:30px; margin:0; max-width:560px; text-transform:uppercase; letter-spacing:.02em; }
+    .newsletter__form{ display:flex; gap:10px; }
+    .newsletter__form input{ border:1px solid #d4dade; background:#fff; border-radius:8px; padding:13px 18px; font-family:inherit; font-size:14px; min-width:300px; outline:none; }
+    .newsletter__form input:focus{ border-color:var(--teal); }
+    .newsletter__form button{ background:var(--teal); border:1px solid var(--teal); border-radius:8px; padding:13px 26px; font-family:inherit; font-size:14px; cursor:pointer; color:#fff; }
+    .newsletter__form button:hover{ background:var(--teal-dark); border-color:var(--teal-dark); color:#fff; }
+    .footer-bottom{ border-top:1px solid #e2e5e8; }
+    .footer-bottom__inner{ max-width:var(--maxw); margin:0 auto; padding:18px 40px; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:13px; color:#6b7278; }
+    .footer-bottom__inner a{ color:#6b7278; text-decoration:none; }
+    .footer-bottom__inner a:hover{ color:var(--teal); }
+
+    /* ─────────────── SEARCH / TAG LIST VIEW ─────────────── */
+    .listing{ max-width:900px; margin:46px auto; padding:0 40px; }
+    .listing__back{ color:var(--teal); font-size:14px; text-decoration:none; }
+    .listing__heading{ color:var(--ink); font-family:var(--serif); font-size:24px; line-height:30px; font-weight:600; margin:14px 0 4px; }
+    .listing__count{ color:var(--muted); font-size:14px; margin:0 0 28px; }
+    .post-row{ display:flex; gap:24px; padding:26px 0; border-bottom:1px solid var(--line); align-items:flex-start; }
+    .post-row__thumb{ width:180px; height:120px; border-radius:0; object-fit:cover; flex-shrink:0; background:var(--grad); display:block; }
+    .post-row__body{ flex:1; min-width:0; }
+    .post-row__title{ font-family:var(--serif); font-size:20px; font-weight:600; color:var(--ink); text-decoration:none; }
+    .post-row__title:hover{ color:var(--teal); }
+    .post-row__body p{ color:var(--body); margin:8px 0 0; line-height:1.6; font-size:18px; }
+    .post-row__meta{ font-size:12px; color:var(--muted); margin-top:8px; letter-spacing:.04em; text-transform:uppercase; }
+    .pagination-wrap{ text-align:center; margin:40px 0; }
+
+    /* ─────────────── RESPONSIVE ─────────────── */
+    @media (max-width:1000px){
+      .cards{ grid-template-columns:repeat(2,1fr); }
+      .cards--community{ grid-template-columns:1fr; }
+      .hero__card h2{ font-size:22px; }
+    }
+    @media (max-width:820px){
+      .nav__menu, .subnav__menu{ display:none; }
+      .featured{ flex-direction:column; height:auto; }
+      .featured__img{ width:100%; min-height:220px; }
+      .featured__body{ padding:32px 26px; }
+      .section__head{ flex-direction:column; }
+      .footer-cols{ flex-wrap:wrap; gap:24px 0; }
+      .footer-col{ flex:1 1 45%; border-right:none; padding:0 0 0 0; }
+      .newsletter__form input{ min-width:0; flex:1; }
+    }
+    @media (max-width:560px){
+      .wrap, .footer-cols, .newsletter__inner, .footer-bottom__inner{ padding-left:20px; padding-right:20px; }
+      .cards{ grid-template-columns:1fr; }
+      .hero__card{ padding:48px 20px 56px; }
+      .hero__card h2{ font-size:20px; }
+      .hero__title{ font-size:22px; }
+      .searchbar{ flex-wrap:wrap; }
+      .post-row__thumb{ width:110px; height:80px; }
+    }
+    /* Search bar on small screens: input keeps a full row (so "Search the blog…" never
+       clips) and the Filters / Search buttons drop to a second row. */
+    @media (max-width:640px){
+      .searchbar{ flex-wrap:wrap; row-gap:10px; }
+      .searchbar__icon{ order:1; }
+      .searchbar input{ order:1; flex:1 1 auto; min-width:0; }
+      .filters-wrap{ order:2; flex:1 1 45%; }
+      .btn-filters{ width:100%; justify-content:center; }
+      .btn-search{ order:2; flex:1 1 45%; }
+    }
+  </style>
+</head>
+<body>
+
+{# ───────────────────────── NAV ───────────────────────── #}
+{% set primary_menu = menu(213273198154) %}
+<nav class="nav" aria-label="Primary navigation">
+  <div class="nav__inner">
+    <!-- Cureus site logo, links to main site; sits left of the Home menu item -->
+    <a class="nav__logo" href="https://www.cureus.com" aria-label="Cureus" style="display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none;">
+      <img src="data:image/png;base64,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" alt="Cureus — Part of Springer Nature" style="height:44px;width:auto;display:block;">
+    </a>
+    <ul class="nav__menu">
+      {% for item in primary_menu.children %}
+        <li>
+          <a href="{{ item.url }}" class="nav__link">{{ item.label }}</a>
+          {% if item.children %}
+            <ul class="nav__dd">
+              {% for child in item.children %}
+                <li><a href="{{ child.url }}">{{ child.label }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="nav__right">
+      <a href="https://cta-service-cms2.hubspot.com/web-interactives/public/v1/track/redirect?encryptedPayload=AVxigLIUze30gran83%2F5iKfzAUPkH22WffugIDc64rInWoxdEWTq1PY7NqbW3OGhWgijdqvW8Ei2q4%2FTug5YDpSgw1Lwd744xWbQOKh0QZsdBVZlz34PoiyLHRXcJR4aW0m2xUYBMTu2pmNX28hhtOKDzJ9lAyLtpqtR2W7mj9KkDQsPvr1QOUtPOnVA32ChLxg%3D&amp;webInteractiveContentId=205845548937&amp;portalId=46589883" class="nav__cta" target="_blank" rel="noopener noreferrer" crossorigin="anonymous">Submit Research <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></a>
+    </div>
+  </div>
+</nav>
+
+{# ── BLOG SUB-NAV (second row, right-aligned) ── #}
+{% set secondary_menu = menu(213273197925) %}
+<nav class="subnav" aria-label="Blog navigation">
+  <div class="subnav__inner">
+    <ul class="subnav__menu">
+      {% for item in secondary_menu.children %}
+        <li>
+          <a href="{{ item.url }}" class="subnav__link">{{ item.label }}</a>
+          {% if item.children %}
+            <ul class="subnav__dd">
+              {% for child in item.children %}
+                <li><a href="{{ child.url }}">{{ child.label }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</nav>
+
+{# ───────────────────────── HERO ───────────────────────── #}
+<header class="hero">
+  <div class="wrap">
+    <h1 class="hero__title">Cureus Journal of Medical Science Blog</h1>
+    <p class="hero__eyebrow">Blog &amp; Cureus News</p>
+
+    <div class="hero__card">
+      <h2>Eliminating barriers to the generation and dissemination of medical knowledge.</h2>
+      <p>Expert insights, author stories, publishing guidance, and the latest updates from Cureus and our community.</p>
+    </div>
+
+    {# ── Search / results bar (visual; input wired to blog search) ── #}
+    <form class="searchbar" action="{{ group.absolute_url }}" method="get">
+      <span class="searchbar__icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+      </span>
+      <input type="text" name="term" placeholder="Search the blog…" value="{{ request.query_dict.term|default('') }}">
+      <div class="filters-wrap">
+        <button type="button" class="btn-filters" aria-haspopup="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="10" y1="17" x2="14" y2="17"></line></svg>
+          FILTERS
+        </button>
+        <ul class="filters-dd">
+          <li><a href="{{ group.absolute_url }}">All posts</a></li>
+          <li><a href="{{ group.absolute_url }}/tag/knowledge-insights">Knowledge &amp; Insights</a></li>
+          <li><a href="{{ group.absolute_url }}/tag/community">Community</a></li>
+          <li><a href="{{ group.absolute_url }}/tag/news">News</a></li>
+        </ul>
+      </div>
+      <button type="submit" class="btn-search">Search</button>
+    </form>
+  </div>
+</header>
+
+{% if request.query_dict.term %}
+{# ── SEARCH RESULTS: in-template keyword filter over recent posts (title, excerpt, tags). ── #}
+{% set q = request.query_dict.term|lower %}
+{% set matches = [] %}
+{% for post in blog_recent_posts(group.id, 250) %}
+  {% set hay = (post.name|default('') ~ ' ' ~ post.post_list_summary|default(''))|lower %}
+  {% set tagmatch = [] %}
+  {% for t in post.tag_list %}{% if q in (t.name|default(''))|lower %}{% do tagmatch.append(1) %}{% endif %}{% endfor %}
+  {% if q in hay or tagmatch|length > 0 %}{% do matches.append(post) %}{% endif %}
+{% endfor %}
+<div class="listing">
+  <h2 class="listing__heading">Results for "{{ request.query_dict.term }}"</h2>
+  <p class="listing__count">{{ matches|length }} post{% if matches|length != 1 %}s{% endif %} found</p>
+  {% for content in matches %}
+  <div class="post-row">
+    <a href="{{ content.absolute_url }}">
+      {% if content.featured_image %}
+        <img class="post-row__thumb" src="{{ content.featured_image }}" alt="{{ content.featured_image_alt_text|default(content.name) }}">
+      {% else %}
+        <span class="post-row__thumb"></span>
+      {% endif %}
+    </a>
+    <div class="post-row__body">
+      <a class="post-row__title" href="{{ content.absolute_url }}">{{ content.name }}</a>
+      {% if content.post_list_summary %}<p>{{ content.post_list_summary }}</p>{% endif %}
+      <div class="post-row__meta">{{ content.publish_date_localized }}</div>
+    </div>
+  </div>
+  {% endfor %}
+  {% if matches|length == 0 %}<p class="listing__count">No posts matched. Try another keyword.</p>{% endif %}
+  <div style="margin-top:24px;"><a href="{{ group.absolute_url }}" class="listing__back">← Back to all posts</a></div>
+</div>
+
+{% elif tag %}
+{# ───────────────────────── TAG PAGE ───────────────────────── #}
+<div class="listing">
+  <a href="{{ group.absolute_url }}" class="listing__back">← Back to all posts</a>
+  <h2 class="listing__heading">{{ tag.name }}</h2>
+  <p class="listing__count">Posts tagged "{{ tag.name }}"</p>
+  {% for content in contents %}
+  <div class="post-row">
+    <a href="{{ content.absolute_url }}">
+      {% if content.featured_image %}
+        <img class="post-row__thumb" src="{{ content.featured_image }}" alt="{{ content.featured_image_alt_text|default(content.name) }}">
+      {% else %}
+        <span class="post-row__thumb"></span>
+      {% endif %}
+    </a>
+    <div class="post-row__body">
+      <a class="post-row__title" href="{{ content.absolute_url }}">{{ content.name }}</a>
+      {% if content.post_list_summary %}<p>{{ content.post_list_summary }}</p>{% endif %}
+      <div class="post-row__meta">{{ content.publish_date_localized }}</div>
+    </div>
+  </div>
+  {% endfor %}
+  <div class="pagination-wrap">
+    {{ blog_pagination(contents.get_previous_page_link(), contents.get_next_page_link()) }}
+  </div>
+</div>
+
+{% else %}
+{# ───────────────────────── HOMEPAGE ───────────────────────── #}
+{% set featured_list = blog_recent_posts(group.id, 5) %}
+
+{# Strict tag matching via a client-side filter over recent posts — more reliable than blog_recent_tag_posts.
+   A post appears in a section only if it carries that section's exact tag (matched by slug OR name;
+   former slugs included so a renamed pillar keeps working). #}
+{% set all_posts = blog_recent_posts(group.id, 250) %}
+{% set pub_posts = [] %}
+{% set comm_posts = [] %}
+{% set news_posts = [] %}
+{% for post in all_posts %}
+  {% set pslugs = [] %}{% set pnames = [] %}
+  {% for t in post.tag_list %}{% do pslugs.append(t.slug) %}{% do pnames.append(t.name) %}{% endfor %}
+  {% if pub_posts|length < 4 and ('knowledge-insights' in pslugs or 'publishing-insights' in pslugs or 'Knowledge & Insights' in pnames) %}{% do pub_posts.append(post) %}{% endif %}
+  {% if comm_posts|length < 3 and ('community' in pslugs or 'Community' in pnames) %}{% do comm_posts.append(post) %}{% endif %}
+  {% if news_posts|length < 4 and ('news' in pslugs or 'cureus-news' in pslugs or 'News' in pnames) %}{% do news_posts.append(post) %}{% endif %}
+{% endfor %}
+
+<main class="wrap">
+
+  {# ── FEATURED CAROUSEL ── #}
+  <section class="featured" data-carousel>
+    <div class="featured__img">
+      {% for post in featured_list %}
+        <a class="featured__slide-img{% if loop.first %} is-active{% endif %}" href="{{ post.absolute_url }}" aria-label="{{ post.name }}">
+          {% if post.featured_image %}<img src="{{ post.featured_image }}" alt="{{ post.name }}">{% endif %}
+        </a>
+      {% endfor %}
+    </div>
+    <div class="featured__body">
+      <div class="featured__slides">
+        {% for post in featured_list %}
+        <div class="featured__slide{% if loop.first %} is-active{% endif %}">
+          <h2 class="featured__title"><a href="{{ post.absolute_url }}">{{ post.name }}</a></h2>
+          {# Auto-populate the meta description of each featured article under its title; fall back to the list summary if no meta description is set. #}
+          {% set featured_desc = post.meta_description|default('') %}
+          {% if not featured_desc %}{% set featured_desc = post.post_list_summary|default('') %}{% endif %}
+          {% if featured_desc %}<p class="featured__excerpt">{{ featured_desc }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="featured__controls">
+        <div class="carousel-arrows">
+          <button class="carousel-arrow" type="button" data-prev aria-label="Previous">&#8592;</button>
+          <button class="carousel-arrow" type="button" data-next aria-label="Next">&#8594;</button>
+        </div>
+        <div class="carousel-dots">
+          {% for p in featured_list %}<button class="carousel-dot{% if loop.first %} is-active{% endif %}" type="button" data-dot="{{ loop.index0 }}" aria-label="Go to slide {{ loop.index }}"></button>{% endfor %}
+        </div>
+        <a href="{{ group.absolute_url }}" class="btn-readmore" data-readmore>Read More</a>
+      </div>
+    </div>
+  </section>
+
+  {# ── PUBLISHING INSIGHTS ── #}
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <h2 class="section__title">Knowledge &amp; Insights</h2>
+        <p class="section__sub">Guidance, trends, and expert advice for authors and researchers</p>
+      </div>
+      <a href="{{ group.absolute_url }}/tag/knowledge-insights" class="btn-viewall">View All →</a>
+    </div>
+    <div class="cards">
+      {% for post in pub_posts %}
+      <article class="card">
+        <a href="{{ post.absolute_url }}">
+          {% if post.featured_image %}<img class="card__img" src="{{ post.featured_image }}" alt="{{ post.name }}">{% else %}<span class="card__img"></span>{% endif %}
+        </a>
+        <div class="card__meta">
+          <span class="card__tag">Knowledge &amp; Insights</span>
+          <span class="card__date">{{ post.publish_date_localized }}</span>
+        </div>
+        <h3 class="card__title"><a href="{{ post.absolute_url }}">{{ post.name }}</a></h3>
+        {% set _words = post.post_body|striptags|wordcount %}{% set _rt = (_words / 200)|round(0, 'ceil')|int %}{% if _rt < 1 %}{% set _rt = 1 %}{% endif %}
+        <div class="card__stats">
+          <span class="stat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 8 12 12 15 14"></polyline></svg>{{ _rt }} min read</span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ── COMMUNITY (asymmetric) ── #}
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <h2 class="section__title">Community</h2>
+        <p class="section__sub">Stories from authors, reviewers, editors, and the Cureus community</p>
+      </div>
+      <a href="{{ group.absolute_url }}/tag/community" class="btn-viewall">View All →</a>
+    </div>
+    <div class="cards cards--community">
+      {% for post in comm_posts %}
+      <article class="card">
+        <a href="{{ post.absolute_url }}">
+          {% if post.featured_image %}<img class="card__img" src="{{ post.featured_image }}" alt="{{ post.name }}">{% else %}<span class="card__img"></span>{% endif %}
+        </a>
+        <div class="card__meta">
+          <span class="card__tag card__tag--open">Community</span>
+          <span class="card__date">{{ post.publish_date_localized }}</span>
+        </div>
+        <h3 class="card__title"><a href="{{ post.absolute_url }}">{{ post.name }}</a></h3>
+        {% set _words = post.post_body|striptags|wordcount %}{% set _rt = (_words / 200)|round(0, 'ceil')|int %}{% if _rt < 1 %}{% set _rt = 1 %}{% endif %}
+        <div class="card__stats">
+          <span class="stat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 8 12 12 15 14"></polyline></svg>{{ _rt }} min read</span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {# ── CUREUS NEWS ── #}
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <h2 class="section__title">News</h2>
+        <p class="section__sub">Updates, announcements, and news from Cureus</p>
+      </div>
+      <a href="{{ group.absolute_url }}/tag/news" class="btn-viewall">View All →</a>
+    </div>
+    <div class="cards">
+      {% for post in news_posts %}
+      <article class="card">
+        <a href="{{ post.absolute_url }}">
+          {% if post.featured_image %}<img class="card__img" src="{{ post.featured_image }}" alt="{{ post.name }}">{% else %}<span class="card__img"></span>{% endif %}
+        </a>
+        <div class="card__meta">
+          <span class="card__tag">News</span>
+          <span class="card__date">{{ post.publish_date_localized }}</span>
+        </div>
+        <h3 class="card__title"><a href="{{ post.absolute_url }}">{{ post.name }}</a></h3>
+        {% set _words = post.post_body|striptags|wordcount %}{% set _rt = (_words / 200)|round(0, 'ceil')|int %}{% if _rt < 1 %}{% set _rt = 1 %}{% endif %}
+        <div class="card__stats">
+          <span class="stat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 8 12 12 15 14"></polyline></svg>{{ _rt }} min read</span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+</main>
+{% endif %}
+
+{# ───────────────────────── FOOTER ───────────────────────── #}
+<footer class="site-footer">
+  <div class="footer-cols">
+    <div class="footer-col">
+      <h4>Published Content</h4>
+      <a href="https://www.cureus.com/specialties">Specialties</a>
+      <a href="https://www.cureus.com/articles">Articles</a>
+      <a href="https://www.cureus.com/posters">Posters</a>
+      <a href="https://www.cureus.com/abstracts">Abstracts</a>
+      <a href="https://www.cureus.com/collections">Collections</a>
+      <a href="https://www.cureus.com/channels/all">Channels</a>
+      <a href="https://www.cureus.com/competitions/past_competitions">Competitions</a>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="https://www.cureus.com/guides">Cureus Guides</a>
+      <a href="https://www.cureus.com/honors">Cureus Honors</a>
+      <a href="https://www.cureus.com/cureus_editing_services">Author Fees</a>
+      <a href="https://www.cureus.com/siq">SIQ</a>
+      <a href="https://www.cureus.com/article_promotion">Article Promotion</a>
+      <a href="https://www.cureus.com/advertising">Advertising Policy</a>
+      <a href="https://www.cureus.com/ads_sponsorship">Advertise With Us</a>
+      <a href="https://www.cureus.com/privacy">Privacy Policy</a>
+      <a href="https://www.springernature.com/gp/legal/us-state-privacy-rights">US State Privacy Rights</a>
+      <a href="https://www.cureus.com/terms">Terms of Use</a>
+      <a href="https://www.cureus.com/faq">FAQ</a>
+    </div>
+    <div class="footer-col">
+      <h4>About Us</h4>
+      <a href="https://www.cureus.com/about">About Cureus</a>
+      <a href="https://www.cureus.com/editorial_board">Editorial Board</a>
+      <a href="https://www.cureus.com/associate_editors">Associate Editors</a>
+      <a href="https://www.cureus.com/about_publishing">About Publishing</a>
+      <a href="https://www.cureus.com/about_peer_review">About Peer Review</a>
+      <a href="https://www.cureus.com/channels">About Channels</a>
+      <a href="https://www.cureus.com/about_collections">About Collections</a>
+      <a href="https://www.cureus.com/competitions">About Competitions</a>
+      <a href="https://www.cureus.com/partnerships">Partnerships</a>
+      <a href="https://www.cureus.com/careers">Careers</a>
+      <a href="https://www.cureus.com/sitemap">Sitemap</a>
+    </div>
+    <div class="footer-col">
+      <h4>Stay Connected</h4>
+      <a href="https://www.cureus.com/contact">Contact Us</a>
+      <a href="https://www.cureus.com/email_preferences">Emails and Alerts</a>
+      <a href="https://www.linkedin.com/company/cureus/">LinkedIn</a>
+      <a href="https://www.facebook.com/CureusJournalofMedicalScience/">Facebook</a>
+      <a href="https://x.com/cureusmedical">X</a>
+      <a href="https://www.instagram.com/cureusmedical/">Instagram</a>
+      <a href="https://www.youtube.com/channel/UCtJKOEpL-TGVsq-u8H3sPzQ">Youtube</a>
+      <a href="https://bsky.app/profile/cureusmedical.bsky.social">BlueSky</a>
+      <a href="https://www.tiktok.com/@cureusmedical">TikTok</a>
+    </div>
+  </div>
+
+  <div class="newsletter">
+    <div class="newsletter__inner">
+      <h3 class="newsletter__title">Subscribe to our newsletter for all the latest news and updates</h3>
+      <form class="newsletter__form" data-hsform>
+        <input type="email" name="email" required placeholder="Enter your email address" aria-label="Email address">
+        <button type="submit">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom__inner">
+      <span>ISSN: 2168-8184</span>
+      <span>Public user content licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a></span>
+      <span>CUREUS&reg; is a registered trademark of Cureus, Inc. in the United States.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    document.querySelectorAll('.featured[data-carousel]').forEach(function (car) {
+      var imgs   = car.querySelectorAll('.featured__slide-img');
+      var slides = car.querySelectorAll('.featured__slide');
+      var dots   = car.querySelectorAll('.carousel-dot');
+      var prev   = car.querySelector('[data-prev]');
+      var next   = car.querySelector('[data-next]');
+      var readmore = car.querySelector('[data-readmore]');
+      var slidesBox = car.querySelector('.featured__slides');
+      var n = slides.length;
+      var i = 0;
+
+      /* Give the title all the lines it needs, then let the excerpt take whatever vertical
+         space is left — clamped to a whole number of lines that fit (max 4) with an ellipsis.
+         A long title therefore "eats" the excerpt's space cleanly instead of the excerpt
+         being hard-clipped mid-line by the fixed-height box. */
+      function clampExcerpt() {
+        if (!slidesBox) { return; }
+        var active = slides[i];
+        if (!active) { return; }
+        var title = active.querySelector('.featured__title');
+        var exc   = active.querySelector('.featured__excerpt');
+        if (!exc) { return; }
+        exc.style.webkitLineClamp = '';
+        var cs = window.getComputedStyle(exc);
+        var lineH = parseFloat(cs.lineHeight) || 30;
+        var mt = parseFloat(cs.marginTop) || 0;
+        var mb = parseFloat(cs.marginBottom) || 0;
+        var titleH = title ? title.offsetHeight : 0;
+        var avail = slidesBox.clientHeight - titleH - mt - mb;
+        var lines = Math.floor(avail / lineH);
+        if (lines < 1) { lines = 1; }
+        if (lines > 5) { lines = 5; }
+        exc.style.webkitLineClamp = String(lines);
+      }
+
+      function show(k) {
+        i = (k + n) % n;
+        imgs.forEach(function (el, idx) { el.classList.toggle('is-active', idx === i); });
+        slides.forEach(function (el, idx) { el.classList.toggle('is-active', idx === i); });
+        dots.forEach(function (el, idx) { el.classList.toggle('is-active', idx === i); });
+        if (readmore) {
+          var link = slides[i].querySelector('a[href]');
+          if (link) { readmore.setAttribute('href', link.getAttribute('href')); }
+        }
+        clampExcerpt();
+      }
+
+      if (prev) { prev.addEventListener('click', function () { show(i - 1); }); }
+      if (next) { next.addEventListener('click', function () { show(i + 1); }); }
+      dots.forEach(function (dot, idx) {
+        dot.addEventListener('click', function () { show(idx); });
+      });
+
+      /* Recompute when the layout can change: viewport resize (title wrap count shifts)
+         and after the web fonts load (font swap changes the title's height). */
+      var _rt;
+      window.addEventListener('resize', function () { clearTimeout(_rt); _rt = setTimeout(clampExcerpt, 120); });
+      if (document.fonts && document.fonts.ready) { document.fonts.ready.then(clampExcerpt); }
+
+      show(0);
+    });
+  })();
+</script>
+<script>
+  /* Newsletter -> submits to the HubSpot form's API, which records a real form
+     submission (so form-triggered workflows still fire). Portal 46589883, form 4969c11e-... */
+  (function(){
+    var ENDPOINT='https://api.hsforms.com/submissions/v3/integration/submit/46589883/4969c11e-c011-42c4-a1e1-3878c72f7aa2';
+    document.querySelectorAll('form[data-hsform]').forEach(function(f){
+      f.addEventListener('submit', function(e){
+        e.preventDefault();
+        var input=f.querySelector('input[type="email"]');
+        var email=input?input.value.trim():'';
+        if(!email) return;
+        var btn=f.querySelector('button');
+        if(btn){ btn.disabled=true; btn.textContent='Subscribing…'; }
+        var hutk=(document.cookie.match(/hubspotutk=([^;]+)/)||[])[1];
+        var ctx={ pageUri:location.href, pageName:document.title };
+        if(hutk){ ctx.hutk=hutk; }
+        fetch(ENDPOINT,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({ fields:[{name:'email',value:email}], context:ctx })
+        }).then(function(r){
+          if(r.ok){
+            f.innerHTML='<span style="font-family:\'Inter\',\'Helvetica Neue\',Arial,sans-serif;font-size:15px;font-weight:500;color:#1a9fbd;">Thanks — you\'re subscribed!</span>';
+          } else {
+            if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
+            r.json().then(function(d){ alert((d&&d.message)||'Sorry, something went wrong. Please try again.'); }).catch(function(){ alert('Sorry, something went wrong. Please try again.'); });
+          }
+        }).catch(function(){
+          if(btn){ btn.disabled=false; btn.textContent='Subscribe'; }
+          alert('Network error. Please try again.');
+        });
+      });
+    });
+  })();
+</script>
+<script>
+  /* Footer links open in a new tab */
+  (function(){
+    document.querySelectorAll('.site-footer a[href^="http"]').forEach(function(a){
+      a.setAttribute('target','_blank');
+      a.setAttribute('rel','noopener noreferrer');
+    });
+  })();
+</script>
+<!-- Mobile navigation (hamburger) — builds a mobile menu from the existing nav on small screens -->
+<style>
+  .nav__toggle{ display:none; align-items:center; justify-content:center; width:42px; height:42px; padding:0; border:1px solid var(--line); border-radius:8px; background:#fff; color:#2b3137; cursor:pointer; }
+  .nav__toggle svg{ display:block; }
+  #cureusMobileMenu{ display:none; border-bottom:1px solid var(--line); background:#fff; }
+  #cureusMobileMenu.is-open{ display:block; }
+  #cureusMobileMenu ul{ list-style:none; margin:0; padding:8px 0; }
+  #cureusMobileMenu a{ display:block; padding:11px 24px; font-family:var(--sans); font-size:15px; color:#2b3137; text-decoration:none; }
+  #cureusMobileMenu a:hover{ background:#f5fafc; color:var(--teal); }
+  #cureusMobileMenu a.is-child{ padding-left:44px; font-size:14px; color:#52606b; }
+  #cureusMobileMenu .sep{ height:1px; background:var(--line); margin:6px 0; }
+  @media (max-width:820px){
+    .nav__menu, .subnav__menu{ display:none !important; }
+    .nav__toggle{ display:inline-flex; }
+    .nav__right{ margin-left:auto; }
+  }
+</style>
+<script>
+(function(){
+  function init(){
+    var navInner=document.querySelector('.nav__inner');
+    if(!navInner||document.querySelector('.nav__toggle'))return;
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='nav__toggle';btn.setAttribute('aria-label','Menu');btn.setAttribute('aria-expanded','false');
+    btn.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+    navInner.insertBefore(btn,navInner.firstChild);
+    var panel=document.createElement('nav');panel.id='cureusMobileMenu';panel.setAttribute('aria-label','Mobile menu');
+    var ul=document.createElement('ul');
+    function addLink(a,child){if(!a)return;var li=document.createElement('li');var na=document.createElement('a');na.href=a.getAttribute('href')||'#';na.textContent=(a.textContent||'').trim();if(child)na.className='is-child';li.appendChild(na);ul.appendChild(li);}
+    function addMenu(menu,ddSel){if(!menu)return;menu.querySelectorAll(':scope > li').forEach(function(li){addLink(li.querySelector(':scope > a'),false);var dd=li.querySelector(ddSel);if(dd){dd.querySelectorAll('li > a').forEach(function(ca){addLink(ca,true);});}});}
+    addMenu(document.querySelector('.nav__menu'),'.nav__dd');
+    var sub=document.querySelector('.subnav__menu');
+    if(sub&&sub.querySelector('li')){var sep=document.createElement('li');sep.innerHTML='<div class="sep"></div>';ul.appendChild(sep);addMenu(sub,'.subnav__dd');}
+    panel.appendChild(ul);
+    var anchor=document.querySelector('.subnav')||document.querySelector('.nav');
+    anchor.parentNode.insertBefore(panel,anchor.nextSibling);
+    btn.addEventListener('click',function(){var open=panel.classList.toggle('is-open');btn.setAttribute('aria-expanded',open?'true':'false');});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<script>
+/* Link target policy: menu links and links that stay within the blog (reading a post,
+   category/tag pages, pagination, search) open in the SAME tab. Every link that leaves
+   the blog — the main Cureus site, the logo, footer, social, external references — opens
+   in a NEW tab so the blog stays open. */
+(function(){
+  var host = location.hostname;
+  function inMenu(a){
+    return a.closest('.nav__menu') || a.closest('.subnav__menu') || a.closest('#cureusMobileMenu');
+  }
+  function apply(){
+    document.querySelectorAll('a[href]').forEach(function(a){
+      if (a.dataset.tabDone) return;
+      if (inMenu(a)) { a.dataset.tabDone='1'; return; }            // menu links: same tab
+      var raw = a.getAttribute('href') || '';
+      if (!raw || raw.charAt(0)==='#' || /^(javascript:|mailto:|tel:)/i.test(raw)) { a.dataset.tabDone='1'; return; }
+      var url; try { url = new URL(a.href, location.href); } catch(e){ a.dataset.tabDone='1'; return; }
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') { a.dataset.tabDone='1'; return; }
+      // Leaves the blog when: different host, OR footer link, OR the site logo.
+      var leavesBlog = (url.hostname !== host) || !!a.closest('.site-footer') || a.classList.contains('nav__logo');
+      if (leavesBlog) { a.setAttribute('target','_blank'); a.setAttribute('rel','noopener noreferrer'); }
+      a.dataset.tabDone='1';
+    });
+  }
+  apply();
+  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', apply);
+  window.addEventListener('load', apply);   // catch the mobile menu built on load
+})();
+</script>
+
+{{ standard_footer_includes }}
+</body>
+</html>
