@@ -1,0 +1,1315 @@
+<!--
+    templateType: blog_post
+    isAvailableForNewContent: true
+    label: Cureus Custom Blog Post
+-->
+<!DOCTYPE html>
+<html lang="{{ html_lang }}" {{ html_lang_dir }}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% if content.html_title %}
+      <title>{{ content.html_title }}</title>
+    {% endif %}
+    <meta name="description" content="{{ content.meta_description }}" />
+    {% if brand_settings.primaryFavicon.src %}
+      <link rel="shortcut icon" href="{{ brand_settings.primaryFavicon.src }}" />
+    {% endif %}
+    {{ standard_header_includes }}
+    <!-- Cureus blog fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      /* Direct @font-face — loads the full variable fonts reliably. Matches blog.cureus.com. */
+      @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2');}
+      @font-face{font-family:'Roboto Slab';font-style:normal;font-weight:100 900;font-display:swap;src:url('https://fonts.gstatic.com/s/robotoslab/v36/BngMUXZYTXPIvIBgJJSb6ufN5qWr4xCC.woff2') format('woff2');}
+      :root {
+        /* Blog.cureus.com palette (nav / footer / newsletter / cards) */
+        --teal: #1a9fbd;
+        --teal-dark: #127f99;
+        --ink: #000;
+        --body: #475158;
+        --muted: #8a929a;
+        --line: #e7ebee;
+        --serif: 'Roboto Slab', Georgia, 'Times New Roman', serif;
+        --sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+        --maxw: 1280px;
+        --grad: radial-gradient(120% 120% at 30% 25%, #bfe6f4 0%, #66bfdf 45%, #1f9ad0 100%);
+        --grad-soft: linear-gradient(135deg, #e6f3fa 0%, #d2ebf6 100%);
+        /* Article body palette */
+        --cureus-navy: #0f1f33;
+        --article-ink: #343a40; /* design article text/heading color (Gray-800) */
+        --cureus-blue: #0057d9;
+        --cureus-teal: #0096b7;
+        --cureus-teal-dark: #007f9b;
+        --cureus-border: #d9e2ef;
+        --cureus-light-blue: #f5f8ff;
+        --cureus-muted: #4d5f73;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+        color: var(--cureus-navy);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; }
+      main { width: 100%; }
+      /* All images render with square corners */
+      img { border-radius: 0 !important; }
+
+      /* ─────────────────────────  TOP NAV (matches blog.cureus.com)  ───────────────────────── */
+      .nav { border-bottom: 1px solid var(--line); background: #fff; }
+      .nav__inner { display: flex; align-items: center; gap: 28px; max-width: var(--maxw); margin: 0 auto; padding: 18px 40px; }
+      .nav__menu { display: flex; align-items: center; gap: 26px; list-style: none; margin: 0; padding: 0; flex: 1; }
+      .nav__menu > li { position: relative; }
+      .nav__link { font-family: var(--sans); font-size: 15px; color: #73797e; text-decoration: none; white-space: nowrap; }
+      .nav__link:hover { color: var(--teal); }
+      .nav__menu > li:hover .nav__dd { display: block; }
+      /* Transparent bridge across the 14px gap so the dropdown stays open while the cursor moves onto it */
+      .nav__dd::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+      .nav__dd { display: none; position: absolute; top: 100%; left: 0; margin-top: 14px; background: #fff; border: 1px solid var(--line);
+        list-style: none; padding: 6px 0; min-width: 210px; z-index: 200; box-shadow: 0 10px 30px rgba(20, 40, 60, .10); border-radius: 8px; }
+      .nav__dd li a { display: block; padding: 9px 18px; font-family: var(--sans); font-size: 14px; color: #2b3137; text-decoration: none; }
+      .nav__dd li a:hover { background: #f5fafc; color: var(--teal); }
+      .nav__right { display: flex; align-items: center; gap: 18px; }
+      .nav__cta { display: inline-flex; align-items: center; gap: 10px; background: #0096b7; color: #fff; text-decoration: none; font-family: var(--sans);
+        font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: normal; padding: 13px 16px; border-radius: 8px; white-space: nowrap; }
+      .nav__cta svg { flex-shrink: 0; }
+      .nav__cta:hover { background: #007e99; }
+      /* Blog sub-nav (second row) */
+      .subnav { border-bottom: 1px solid var(--line); background: #fff; }
+      .subnav__inner { display: flex; justify-content: center; max-width: var(--maxw); margin: 0 auto; padding: 0 40px; }
+      .subnav__menu { display: flex; align-items: center; gap: 22px; list-style: none; margin: 0; padding: 0; }
+      .subnav__menu > li { position: relative; }
+      .subnav__link { display: flex; align-items: center; height: 48px; font-family: var(--sans); font-size: 14px; color: #52606b; text-decoration: none; white-space: nowrap; }
+      .subnav__link:hover { color: var(--teal); }
+      .subnav__menu > li:hover .subnav__dd { display: block; }
+      .subnav__dd { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid var(--line); list-style: none;
+        margin: 0; padding: 6px 0; min-width: 220px; z-index: 200; box-shadow: 0 10px 30px rgba(20, 40, 60, .10); border-radius: 8px; }
+      .subnav__dd li a { display: block; padding: 9px 18px; font-family: var(--sans); font-size: 14px; color: #2b3137; text-decoration: none; }
+      .subnav__dd li a:hover { background: #f5fafc; color: var(--teal); }
+
+      /* ─────────────────────────  BREADCRUMBS  ───────────────────────── */
+      .breadcrumbs { border-bottom: 1px solid var(--line); background: #fff; }
+      .breadcrumbs__inner {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+        max-width: var(--maxw); margin: 0 auto; padding: 14px 40px;
+        font-family: var(--sans); font-size: 13px; color: var(--muted);
+      }
+      .breadcrumbs a { color: var(--teal); text-decoration: none; }
+      .breadcrumbs a:hover { text-decoration: underline; }
+      .breadcrumbs__sep { color: var(--muted); }
+      .breadcrumbs__current {
+        color: var(--cureus-muted);
+        max-width: 48ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      @media (max-width: 560px) { .breadcrumbs__inner { padding: 12px 20px; } }
+
+      /* ─────────────────────────  ARTICLE  ───────────────────────── */
+      /* Article shell: article centered with Previous/Next post cards flanking the top.
+         Mobile-first: cards sit in a row above the article; at >=1120px they move to
+         side rails on either side of the article. */
+      .article-shell {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 20px 24px 40px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+          "prev next"
+          "main main";
+        column-gap: 16px;
+        row-gap: 24px;
+        box-sizing: border-box;
+      }
+      .cureus-blog-post {
+        grid-area: main;
+        width: 100%;
+        min-width: 0;
+        margin: 0;
+        padding: 4px 0 0;
+        box-sizing: border-box;
+      }
+      @media (min-width: 1120px) {
+        .article-shell {
+          max-width: 1240px;
+          padding: 24px 40px 0;
+          grid-template-columns: 1fr 680px 1fr;
+          grid-template-areas: "prev main next";
+          column-gap: 16px;
+          align-items: start;
+        }
+        /* Vertical hairline dividers separating the Previous Post rail | article | Next Post rail */
+        .cureus-blog-post {
+          padding-left: 40px;
+          padding-right: 40px;
+          border-left: 1px solid var(--cureus-border);
+          border-right: 1px solid var(--cureus-border);
+        }
+      }
+      .blog-featured-image { margin: 0 0 28px; }
+      .blog-featured-image img { display: block; width: 100%; height: auto; border-radius: 0; }
+      .blog-post-eyebrow {
+        margin: 0 0 14px;
+        font-family: var(--sans);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        line-height: 1.4;
+      }
+      .blog-post-eyebrow-author { color: var(--teal); text-decoration: none; }
+      .blog-post-eyebrow-author:hover { text-decoration: underline; }
+      .blog-post-eyebrow-sep { margin: 0 8px; color: var(--muted); }
+      .blog-post-eyebrow-date { color: var(--muted); }
+      .blog-post-title {
+        margin: 0 0 20px;
+        color: var(--article-ink);
+        font-family: var(--serif);
+        font-size: 30px;
+        font-weight: 600;
+        line-height: 1.28;
+        letter-spacing: 0;
+      }
+      /* Meta bar: read time on the left, share icons on the right */
+      .blog-post-metabar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin: 0 0 40px;
+        padding: 16px 0;
+        border-top: 1px solid var(--cureus-border);
+        border-bottom: 1px solid var(--cureus-border);
+      }
+      .blog-read-time {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--cureus-muted);
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .blog-read-time svg { flex-shrink: 0; }
+      .blog-post-body {
+        color: var(--article-ink);
+        font-family: var(--serif);
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 1.4;
+      }
+      .blog-post-body p,
+      .blog-post-body li,
+      .blog-post-body div,
+      .blog-post-body span,
+      .blog-post-body blockquote,
+      .blog-post-body td,
+      .blog-post-body th {
+        font-family: var(--serif) !important;
+        font-weight: 400 !important;
+        color: var(--article-ink);
+        line-height: 1.4;
+      }
+      .blog-post-body p { margin: 0 0 16px; }
+      .blog-post-body ul,
+      .blog-post-body ol { margin: 0 0 28px; padding-left: 28px; }
+      .blog-post-body li { margin-bottom: 8px; }
+      .blog-post-body h1,
+      .blog-post-body h2,
+      .blog-post-body h3,
+      .blog-post-body h4,
+      .blog-post-body h5,
+      .blog-post-body h6,
+      .blog-post-body h1 *,
+      .blog-post-body h2 *,
+      .blog-post-body h3 *,
+      .blog-post-body h4 *,
+      .blog-post-body h5 *,
+      .blog-post-body h6 * {
+        color: var(--article-ink) !important;
+        font-family: var(--serif) !important;
+        font-weight: 500 !important;
+        line-height: 1.45 !important;
+      }
+      .blog-post-body h1 { margin: 40px 0 16px; font-size: 26px; letter-spacing: 0; }
+      .blog-post-body h2 { margin: 36px 0 12px; font-size: 22px; letter-spacing: 0; }
+      .blog-post-body h3 { margin: 30px 0 10px; font-size: 19px; letter-spacing: 0; }
+      .blog-post-body h4 { margin: 26px 0 8px; font-size: 17px; }
+      .blog-post-body a { color: var(--cureus-blue); text-decoration: none; }
+      .blog-post-body a:hover { text-decoration: underline; }
+      .blog-post-body blockquote {
+        margin: 32px 0;
+        padding: 20px 24px;
+        border-left: 4px solid var(--teal);
+        background: var(--cureus-light-blue);
+      }
+      .blog-post-body blockquote p:last-child { margin-bottom: 0; }
+      /* Keep HubSpot CTA/button wrappers from forcing full-width bars */
+      .blog-post-body .hs_cos_wrapper_type_cta,
+      .blog-post-body .hs-cta-wrapper,
+      .blog-post-body .hs-cta-node,
+      .blog-post-body span[id*="hs-cta"],
+      .blog-post-body div[id*="hs-cta"] {
+        display: inline-block !important;
+        width: auto !important;
+        max-width: max-content !important;
+        margin: 0 0 24px !important;
+      }
+      .blog-post-body .hs_cos_wrapper_type_cta *,
+      .blog-post-body .hs-cta-wrapper *,
+      .blog-post-body .hs-cta-node * { max-width: max-content !important; }
+      /* Cureus default blog button style */
+      .blog-post-body .button,
+      .blog-post-body .btn,
+      .blog-post-body .hs-button,
+      .blog-post-body .cta_button,
+      .blog-post-body a.button,
+      .blog-post-body a.btn,
+      .blog-post-body a.hs-button,
+      .blog-post-body a.cta_button {
+        display: flex !important;
+        width: max-content !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        white-space: nowrap !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        min-height: 40px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 10px 18px !important;
+        border: 1px solid var(--cureus-teal) !important;
+        border-radius: 4px !important;
+        background: var(--cureus-teal) !important;
+        color: #ffffff !important;
+        font-family: var(--sans) !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        box-shadow: none !important;
+      }
+      .blog-post-body .button:hover,
+      .blog-post-body .btn:hover,
+      .blog-post-body .hs-button:hover,
+      .blog-post-body .cta_button:hover,
+      .blog-post-body a.button:hover,
+      .blog-post-body a.btn:hover,
+      .blog-post-body a.hs-button:hover,
+      .blog-post-body a.cta_button:hover {
+        background: var(--cureus-teal-dark) !important;
+        border-color: var(--cureus-teal-dark) !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+      }
+      .blog-post-body .button:focus,
+      .blog-post-body .btn:focus,
+      .blog-post-body .hs-button:focus,
+      .blog-post-body .cta_button:focus,
+      .blog-post-body a.button:focus,
+      .blog-post-body a.btn:focus,
+      .blog-post-body a.hs-button:focus,
+      .blog-post-body a.cta_button:focus {
+        outline: 3px solid rgba(0, 150, 183, 0.25) !important;
+        outline-offset: 2px !important;
+      }
+      /* Allow blog body buttons/CTAs to follow HubSpot center/right alignment */
+      .blog-post-body .text-center,
+      .blog-post-body .align-center,
+      .blog-post-body .aligncenter,
+      .blog-post-body .button-center,
+      .blog-post-body .cta-center,
+      .blog-post-body .cureus-button-center,
+      .blog-post-body [style*='text-align: center'],
+      .blog-post-body [style*='text-align:center'] { text-align: center !important; }
+      .blog-post-body .text-right,
+      .blog-post-body .align-right,
+      .blog-post-body .alignright,
+      .blog-post-body .button-right,
+      .blog-post-body .cta-right,
+      .blog-post-body [style*='text-align: right'],
+      .blog-post-body [style*='text-align:right'] { text-align: right !important; }
+      .blog-post-body .text-center .button,
+      .blog-post-body .align-center .button,
+      .blog-post-body .aligncenter .button,
+      .blog-post-body .button-center .button,
+      .blog-post-body .cta-center .button,
+      .blog-post-body .cureus-button-center .button,
+      .blog-post-body [style*='text-align: center'] .button,
+      .blog-post-body [style*='text-align:center'] .button,
+      .blog-post-body .text-center .hs-button,
+      .blog-post-body .align-center .hs-button,
+      .blog-post-body .aligncenter .hs-button,
+      .blog-post-body .button-center .hs-button,
+      .blog-post-body .cta-center .hs-button,
+      .blog-post-body .cureus-button-center .hs-button,
+      .blog-post-body [style*='text-align: center'] .hs-button,
+      .blog-post-body [style*='text-align:center'] .hs-button,
+      .blog-post-body .text-center .cta_button,
+      .blog-post-body .align-center .cta_button,
+      .blog-post-body .aligncenter .cta_button,
+      .blog-post-body .button-center .cta_button,
+      .blog-post-body .cta-center .cta_button,
+      .blog-post-body .cureus-button-center .cta_button,
+      .blog-post-body [style*='text-align: center'] .cta_button,
+      .blog-post-body [style*='text-align:center'] .cta_button {
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+      /* Social share icons (round buttons) — used in the header meta bar */
+      .blog-social-share-links { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+      .blog-social-share-link {
+        display: inline-flex !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        border: 1px solid var(--cureus-border) !important;
+        border-radius: 999px !important;
+        background: #ffffff !important;
+        color: var(--teal) !important;
+        font-family: var(--sans) !important;
+        font-size: 0 !important;
+        line-height: 1 !important;
+        text-decoration: none !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
+      }
+      .blog-social-share-link::before {
+        content: '';
+        display: block;
+        width: 17px;
+        height: 17px;
+        background-color: currentColor;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+      }
+      .blog-social-share-linkedin::before {
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.98 3.5C4.98 4.88 3.86 6 2.5 6S.02 4.88.02 3.5 1.14 1 2.5 1s2.48 1.12 2.48 2.5ZM.31 8.02h4.38V23H.31V8.02ZM7.61 8.02h4.2v2.05h.06c.59-1.11 2.02-2.28 4.16-2.28 4.45 0 5.27 2.93 5.27 6.74V23h-4.38v-7.51c0-1.79-.03-4.1-2.5-4.1-2.5 0-2.88 1.95-2.88 3.97V23H7.61V8.02Z'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.98 3.5C4.98 4.88 3.86 6 2.5 6S.02 4.88.02 3.5 1.14 1 2.5 1s2.48 1.12 2.48 2.5ZM.31 8.02h4.38V23H.31V8.02ZM7.61 8.02h4.2v2.05h.06c.59-1.11 2.02-2.28 4.16-2.28 4.45 0 5.27 2.93 5.27 6.74V23h-4.38v-7.51c0-1.79-.03-4.1-2.5-4.1-2.5 0-2.88 1.95-2.88 3.97V23H7.61V8.02Z'/%3E%3C/svg%3E") center / contain no-repeat;
+      }
+      .blog-social-share-x::before {
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.9 2h3.68l-8.04 9.19L24 22h-7.4l-5.8-6.93L4.16 22H.47l8.6-9.83L0 2h7.58l5.24 6.29L18.9 2Zm-1.29 18.1h2.04L6.47 3.8H4.28L17.61 20.1Z'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M18.9 2h3.68l-8.04 9.19L24 22h-7.4l-5.8-6.93L4.16 22H.47l8.6-9.83L0 2h7.58l5.24 6.29L18.9 2Zm-1.29 18.1h2.04L6.47 3.8H4.28L17.61 20.1Z'/%3E%3C/svg%3E") center / contain no-repeat;
+      }
+      .blog-social-share-facebook::before {
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22.68 12.07C22.68 5.95 17.73 1 11.61 1S.54 5.95.54 12.07c0 5.53 4.05 10.11 9.35 10.94v-7.73H7.08v-3.21h2.81V9.63c0-2.78 1.66-4.31 4.19-4.31 1.21 0 2.48.22 2.48.22v2.72h-1.4c-1.37 0-1.8.85-1.8 1.73v2.08h3.06l-.49 3.21h-2.57V23c5.3-.83 9.32-5.41 9.32-10.93Z'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M22.68 12.07C22.68 5.95 17.73 1 11.61 1S.54 5.95.54 12.07c0 5.53 4.05 10.11 9.35 10.94v-7.73H7.08v-3.21h2.81V9.63c0-2.78 1.66-4.31 4.19-4.31 1.21 0 2.48.22 2.48.22v2.72h-1.4c-1.37 0-1.8.85-1.8 1.73v2.08h3.06l-.49 3.21h-2.57V23c5.3-.83 9.32-5.41 9.32-10.93Z'/%3E%3C/svg%3E") center / contain no-repeat;
+      }
+      .blog-social-share-email::before {
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3.5 5h17A2.5 2.5 0 0 1 23 7.5v9A2.5 2.5 0 0 1 20.5 19h-17A2.5 2.5 0 0 1 1 16.5v-9A2.5 2.5 0 0 1 3.5 5Zm0 2c-.13 0-.25.02-.36.07L12 12.92l8.86-5.85A.98.98 0 0 0 20.5 7h-17Zm17 10a.5.5 0 0 0 .5-.5V9.28l-8.45 5.58a1 1 0 0 1-1.1 0L3 9.28v7.22a.5.5 0 0 0 .5.5h17Z'/%3E%3C/svg%3E") center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3.5 5h17A2.5 2.5 0 0 1 23 7.5v9A2.5 2.5 0 0 1 20.5 19h-17A2.5 2.5 0 0 1 1 16.5v-9A2.5 2.5 0 0 1 3.5 5Zm0 2c-.13 0-.25.02-.36.07L12 12.92l8.86-5.85A.98.98 0 0 0 20.5 7h-17Zm17 10a.5.5 0 0 0 .5-.5V9.28l-8.45 5.58a1 1 0 0 1-1.1 0L3 9.28v7.22a.5.5 0 0 0 .5.5h17Z'/%3E%3C/svg%3E") center / contain no-repeat;
+      }
+      .blog-social-share-link:hover {
+        border-color: var(--teal) !important;
+        background: var(--cureus-light-blue) !important;
+        color: var(--teal) !important;
+        text-decoration: none !important;
+      }
+      .blog-social-share-link:focus { outline: 3px solid rgba(26, 159, 189, 0.22) !important; outline-offset: 2px !important; }
+      .blog-social-share-link .screen-reader-text,
+      .blog-social-share-link span {
+        position: absolute !important;
+        width: 1px !important; height: 1px !important;
+        padding: 0 !important; margin: -1px !important;
+        overflow: hidden !important; clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important; border: 0 !important;
+      }
+      .blog-post-tags {
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--cureus-border);
+        font-family: var(--sans);
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .blog-post-tags a {
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #f0f5ff;
+        color: var(--cureus-blue);
+        text-decoration: none;
+      }
+      .blog-post-tags a:hover { text-decoration: underline; }
+
+      /* ─────────────────  PREVIOUS / NEXT POST CARDS (side rails)  ───────────────── */
+      .article-aside { min-width: 0; }
+      .article-aside-prev { grid-area: prev; }
+      .article-aside-next { grid-area: next; }
+      @media (min-width: 1120px) {
+        .article-aside { position: sticky; top: 24px; }
+      }
+      /* Borderless card (matches the listing / Similar Posts cards): rounded image, text, button. */
+      .aside-card { display: flex; flex-direction: column; text-decoration: none; }
+      .aside-card-thumb {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1200 / 630;   /* fixed height so both cards' images match → buttons stay aligned */
+        margin: 0 0 14px;
+        border-radius: 0;
+        overflow: hidden;
+        background: #f2f4f7;      /* fallback behind image while loading */
+      }
+      .aside-card-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .aside-card-body { display: flex; flex-direction: column; flex: 1 1 auto; padding: 0; }
+      .aside-card-eyebrow {
+        display: block;
+        margin: 0 0 8px;
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        line-height: 1.4;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .aside-card-tag { color: var(--teal); }
+      .aside-card-eyebrow-sep { margin: 0 5px; color: var(--muted); }
+      .aside-card-eyebrow-date { color: var(--muted); }
+      .aside-card-name {
+        display: block;
+        margin: 0 0 16px;
+        color: var(--article-ink);
+        font-family: var(--serif);
+        font-size: 19px;
+        font-weight: 600;
+        line-height: 1.28;
+      }
+      .aside-card:hover .aside-card-name { color: var(--teal); }
+      .aside-card-btn {
+        display: flex;
+        width: 100%;
+        margin-top: auto;   /* pin the button to the bottom so both cards' buttons align */
+        align-items: center;
+        justify-content: center;
+        padding: 13px 18px;
+        border-radius: 8px;
+        background: var(--teal);
+        color: #ffffff;
+        font-family: var(--sans);
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0;
+        line-height: 1.2;
+      }
+      .aside-card:hover .aside-card-btn { background: var(--teal-dark); }
+
+      /* ─────────────────  SIMILAR POSTS (bottom card row, like listing)  ───────────────── */
+      .similar-section { width: 100%; margin: 32px 0 0; }
+      .similar-inner {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 40px 40px 0;
+        border-top: 1px solid var(--cureus-border);
+        box-sizing: border-box;
+      }
+      .similar-section .section__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 26px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--cureus-border);
+      }
+      .similar-section .section__title {
+        font-family: var(--serif);
+        font-weight: 600;
+        color: var(--ink);
+        font-size: 24px;
+        line-height: 30px;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        margin: 0;
+      }
+      .similar-section .section__sub {
+        color: var(--teal);
+        font-family: var(--sans);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        margin: 9px 0 0;
+      }
+      .similar-section .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 26px;
+      }
+      .similar-section .card { display: flex; flex-direction: column; text-decoration: none; }
+      /* Vertical hairline dividers between Similar Posts cards (desktop), matching the homepage */
+      @media (min-width: 1000px) {
+        .similar-section .cards > .card { position: relative; }
+        .similar-section .cards > .card + .card::before {
+          content: ""; position: absolute; top: 0; bottom: 0; left: -13px; width: 1px; background: var(--cureus-border);
+        }
+      }
+      .similar-section .card__img {
+        width: 100%;
+        aspect-ratio: 1200 / 630;
+        border-radius: 0;
+        background: #f2f4f7;      /* fallback behind image while loading */
+        object-fit: cover;        /* fill the container edge-to-edge (no letterbox margins) */
+        display: block;
+      }
+      .similar-section .card__meta { display: flex; align-items: center; gap: 10px; margin: 16px 0 8px; flex-wrap: wrap; }
+      .similar-section .card__tag { color: var(--teal); font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+      .similar-section .card__date { color: var(--muted); font-family: var(--sans); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+      .similar-section .card__title { font-family: var(--serif); font-weight: 600; color: var(--ink); font-size: 20px; line-height: 26px; margin: 0; }
+      .similar-section .card__title a { text-decoration: none; color: inherit; }
+      .similar-section .card__title a:hover { color: var(--teal); }
+      .similar-section .card__stats { display: flex; align-items: center; gap: 22px; margin-top: auto; padding-top: 16px; }
+      .similar-section .stat { display: flex; align-items: center; gap: 7px; color: var(--muted); font-family: var(--sans); font-size: 12px; }
+      .similar-section .stat svg { flex-shrink: 0; }
+
+      /* ─────────────────  COMMENTS  ───────────────── */
+      .blog-comments-wrapper {
+        width: min(100% - 48px, 680px);
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 56px 0 64px;
+        box-sizing: border-box;
+        color: var(--article-ink);
+        font-family: var(--serif);
+      }
+      .blog-comments-intro { margin: 0 0 24px; padding-top: 40px; border-top: 1px solid var(--cureus-border); }
+      .blog-comments-intro h2 {
+        margin: 0 0 8px;
+        color: var(--ink);
+        font-family: var(--serif);
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 30px;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+      }
+      .blog-comments-intro p {
+        margin: 0;
+        color: var(--muted);
+        font-family: var(--serif);
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 1.7;
+      }
+      /* Comment form sits plainly on the page — no box, no background */
+      .blog-comments-module {
+        margin-top: 4px;
+      }
+      .blog-comments-wrapper form,
+      .blog-comments-wrapper fieldset,
+      .blog-comments-wrapper .hs-form,
+      .blog-comments-wrapper .hs-form fieldset,
+      .blog-comments-wrapper .hs-form-field,
+      .blog-comments-wrapper .input,
+      .blog-comments-wrapper .hs-input,
+      .blog-comments-wrapper .hs-richtext,
+      .blog-comments-wrapper .form-columns-1,
+      .blog-comments-wrapper .form-columns-2,
+      .blog-comments-wrapper .form-columns-3 {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+      .blog-comments-wrapper fieldset,
+      .blog-comments-wrapper .hs-form fieldset,
+      .blog-comments-wrapper .form-columns-1,
+      .blog-comments-wrapper .form-columns-2,
+      .blog-comments-wrapper .form-columns-3 { display: block !important; }
+      .blog-comments-wrapper .form-columns-2 .hs-form-field,
+      .blog-comments-wrapper .form-columns-3 .hs-form-field { float: none !important; display: block !important; width: 100% !important; }
+      .blog-comments-wrapper .hs-form-field { margin: 0 0 18px !important; }
+      .blog-comments-wrapper label,
+      .blog-comments-wrapper legend,
+      .blog-comments-wrapper .hs-form-field > label {
+        display: block;
+        margin: 0 0 7px;
+        color: var(--article-ink) !important;
+        font-family: var(--sans) !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        line-height: 1.3 !important;
+      }
+      .blog-comments-wrapper .hs-form-field label span,
+      .blog-comments-wrapper .hs-form-required {
+        display: inline !important;
+        margin: 0 !important;
+        color: var(--cureus-navy) !important;
+        font-family: var(--sans) !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        line-height: 1.3 !important;
+      }
+      .blog-comments-wrapper .hs-form-required { margin-left: 2px !important; }
+      .blog-comments-wrapper input[type='text'],
+      .blog-comments-wrapper input[type='email'],
+      .blog-comments-wrapper input[type='url'],
+      .blog-comments-wrapper textarea,
+      .blog-comments-wrapper select,
+      .blog-comments-wrapper .hs-input {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 46px;
+        padding: 11px 14px !important;
+        border: 1px solid #cdd7e2 !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        color: var(--article-ink) !important;
+        font-family: var(--serif) !important;
+        font-size: 16px !important;
+        font-weight: 400 !important;
+        line-height: 1.5 !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+      }
+      .blog-comments-wrapper textarea,
+      .blog-comments-wrapper textarea.hs-input { min-height: 150px !important; resize: vertical; }
+      .blog-comments-wrapper input:focus,
+      .blog-comments-wrapper textarea:focus,
+      .blog-comments-wrapper select:focus,
+      .blog-comments-wrapper .hs-input:focus {
+        border-color: var(--teal) !important;
+        outline: 3px solid rgba(26, 159, 189, 0.18) !important;
+        outline-offset: 1px !important;
+      }
+      .blog-comments-wrapper .hs-error-msg,
+      .blog-comments-wrapper .hs-error-msgs label {
+        color: #b00020 !important;
+        font-family: var(--sans) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+      }
+      .blog-comments-wrapper .hs_website,
+      .blog-comments-wrapper .hs-website,
+      .blog-comments-wrapper .field.hs_website,
+      .blog-comments-wrapper .field.hs-website { display: none !important; }
+      .blog-comments-wrapper .hs-submit,
+      .blog-comments-wrapper .hs-submit .actions { width: auto !important; max-width: max-content !important; }
+      .blog-comments-wrapper input[type='submit'],
+      .blog-comments-wrapper button[type='submit'],
+      .blog-comments-wrapper .hs-button,
+      .blog-comments-wrapper .hs-submit .hs-button {
+        display: inline-flex !important;
+        gap: 0.35em !important;   /* space between "Reply to" and the commenter's name */
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: max-content !important;
+        min-height: 42px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 11px 22px !important;
+        border: 1px solid var(--teal) !important;
+        border-radius: 8px !important;
+        background: var(--teal) !important;
+        color: #ffffff !important;
+        font-family: var(--sans) !important;
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        box-shadow: none !important;
+      }
+      .blog-comments-wrapper input[type='submit']:hover,
+      .blog-comments-wrapper button[type='submit']:hover,
+      .blog-comments-wrapper .hs-button:hover,
+      .blog-comments-wrapper .hs-submit .hs-button:hover {
+        background: var(--teal-dark) !important;
+        border-color: var(--teal-dark) !important;
+        color: #ffffff !important;
+      }
+      .blog-comments-wrapper .g-recaptcha,
+      .blog-comments-wrapper .grecaptcha-badge,
+      .blog-comments-wrapper iframe[src*='recaptcha'] { max-width: 100% !important; }
+      .blog-comments-wrapper input[type='hidden'],
+      .blog-comments-wrapper .hs-fieldtype-hidden,
+      .blog-comments-wrapper .hs-hidden,
+      .blog-comments-wrapper textarea.g-recaptcha-response,
+      .blog-comments-wrapper textarea[name='g-recaptcha-response'],
+      .blog-comments-wrapper textarea[id^='g-recaptcha-response'],
+      .blog-comments-wrapper #g-recaptcha-response {
+        display: none !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+        width: 1px !important;
+        max-width: 1px !important;
+        height: 1px !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        overflow: hidden !important;
+      }
+
+      /* ─────────────────────────  FOOTER + NEWSLETTER (matches blog.cureus.com)  ───────────────────────── */
+      .site-footer { background: #f4f5f6; border-top: 1px solid var(--line); margin-top: 70px; }
+      .footer-cols { display: flex; max-width: var(--maxw); margin: 0 auto; padding: 46px 40px 30px; gap: 0; }
+      .footer-col { flex: 1; padding: 0 28px; border-right: 1px solid #e2e5e8; }
+      .footer-col:first-child { padding-left: 0; }
+      .footer-col:last-child { border-right: none; padding-right: 0; }
+      .footer-col h4 { font-family: var(--serif); font-size: 20px; font-weight: 600; color: #000; margin: 0 0 16px; }
+      .footer-col a { display: block; font-family: var(--serif); font-size: 16px; font-weight: 500; color: #73797e; text-decoration: none; margin-bottom: 10px; }
+      .footer-col a:hover { color: var(--teal); }
+      .newsletter { border-top: 1px solid #e2e5e8; }
+      .newsletter__inner { max-width: var(--maxw); margin: 0 auto; padding: 34px 40px; display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
+      .newsletter__title { font-family: var(--serif); font-weight: 600; color: #000; font-size: 24px; line-height: 30px; margin: 0; max-width: 560px; text-transform: uppercase; letter-spacing: .02em; }
+      .newsletter__form { display: flex; gap: 10px; }
+      .newsletter__form input { border: 1px solid #d4dade; background: #fff; border-radius: 8px; padding: 13px 18px; font-family: var(--sans); font-size: 14px; min-width: 300px; outline: none; }
+      .newsletter__form input:focus { border-color: var(--teal); }
+      .newsletter__form button { background: var(--teal); border: 1px solid var(--teal); border-radius: 8px; padding: 13px 26px; font-family: var(--sans); font-size: 14px; cursor: pointer; color: #fff; }
+      .newsletter__form button:hover { background: var(--teal-dark); border-color: var(--teal-dark); color: #fff; }
+      .footer-bottom { border-top: 1px solid #e2e5e8; }
+      .footer-bottom__inner { max-width: var(--maxw); margin: 0 auto; padding: 18px 40px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-family: var(--sans); font-size: 13px; color: #6b7278; }
+      .footer-bottom__inner a { color: #6b7278; text-decoration: none; }
+      .footer-bottom__inner a:hover { color: var(--teal); }
+
+      /* ─────────────────────────  RESPONSIVE  ───────────────────────── */
+      @media (max-width: 1000px) {
+        .similar-section .cards { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 820px) {
+        .nav__menu, .subnav__menu { display: none; }
+        .footer-cols { flex-wrap: wrap; gap: 24px 0; }
+        .footer-col { flex: 1 1 45%; border-right: none; padding: 0; }
+        .newsletter__form input { min-width: 0; flex: 1; }
+      }
+      @media (max-width: 768px) {
+        .article-shell { padding: 16px 24px 32px; }
+        /* Hide the Previous / Next post cards on mobile */
+        .article-aside { display: none !important; }
+        .cureus-blog-post { padding: 4px 0 32px; }
+        .blog-post-title { font-size: 26px; }
+        .blog-post-body,
+        .blog-post-body p,
+        .blog-post-body li { font-size: 16px; }
+        .blog-post-body h1 { font-size: 24px; }
+        .blog-post-body h2 { font-size: 21px; }
+        .blog-post-body h3 { font-size: 18px; }
+        .blog-comments-wrapper { width: min(100% - 40px, 680px); }
+        .blog-comments-intro h2 { font-size: 23px; }
+      }
+      @media (max-width: 560px) {
+        .footer-cols, .newsletter__inner, .footer-bottom__inner, .similar-inner { padding-left: 20px; padding-right: 20px; }
+        .similar-section .cards { grid-template-columns: 1fr; }
+        .blog-post-title { font-size: 24px; }
+        .article-shell {
+          padding: 16px 20px 28px;
+          grid-template-columns: 1fr;
+          grid-template-areas: "prev" "next" "main";
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {# ─────────────────────────  TOP NAV (matches blog.cureus.com)  ───────────────────────── #}
+    {% set primary_menu = menu(213273198154) %}
+    <nav class="nav" aria-label="Primary navigation">
+      <div class="nav__inner">
+        <!-- Cureus site logo, links to main site; sits left of the Home menu item -->
+        <a class="nav__logo" href="https://www.cureus.com" aria-label="Cureus" style="display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none;">
+          <img src="data:image/png;base64,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" alt="Cureus — Part of Springer Nature" style="height:44px;width:auto;display:block;">
+        </a>
+        <ul class="nav__menu">
+          {% for item in primary_menu.children %}
+            <li>
+              <a href="{{ item.url }}" class="nav__link">{{ item.label }}</a>
+              {% if item.children %}
+                <ul class="nav__dd">
+                  {% for child in item.children %}
+                    <li><a href="{{ child.url }}">{{ child.label }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="nav__right">
+          <a href="https://cta-service-cms2.hubspot.com/web-interactives/public/v1/track/redirect?encryptedPayload=AVxigLIUze30gran83%2F5iKfzAUPkH22WffugIDc64rInWoxdEWTq1PY7NqbW3OGhWgijdqvW8Ei2q4%2FTug5YDpSgw1Lwd744xWbQOKh0QZsdBVZlz34PoiyLHRXcJR4aW0m2xUYBMTu2pmNX28hhtOKDzJ9lAyLtpqtR2W7mj9KkDQsPvr1QOUtPOnVA32ChLxg%3D&amp;webInteractiveContentId=205845548937&amp;portalId=46589883" class="nav__cta" target="_blank" rel="noopener noreferrer" crossorigin="anonymous">Submit Research <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></a>
+        </div>
+      </div>
+    </nav>
+    {# ── BLOG SUB-NAV (second row) ── #}
+    {% set secondary_menu = menu(213273197925) %}
+    <nav class="subnav" aria-label="Blog navigation">
+      <div class="subnav__inner">
+        <ul class="subnav__menu">
+          {% for item in secondary_menu.children %}
+            <li>
+              <a href="{{ item.url }}" class="subnav__link">{{ item.label }}</a>
+              {% if item.children %}
+                <ul class="subnav__dd">
+                  {% for child in item.children %}
+                    <li><a href="{{ child.url }}">{{ child.label }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </nav>
+
+    {# ─────────────────────────  BREADCRUMBS  ───────────────────────── #}
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <div class="breadcrumbs__inner">
+        <a href="{{ group.absolute_url }}">Blog Home</a>
+        {% if content.tag_list %}
+          <span class="breadcrumbs__sep" aria-hidden="true">&rsaquo;</span>
+          <a href="{{ blog_tag_url(group.id, content.tag_list[0].slug) }}">{{ content.tag_list[0].name }}</a>
+        {% endif %}
+        <span class="breadcrumbs__sep" aria-hidden="true">&rsaquo;</span>
+        <span class="breadcrumbs__current" aria-current="page">{{ content.name }}</span>
+      </div>
+    </nav>
+
+    <main>
+      {# ---------------------------------------------------------------
+         Previous / Next articles by publish date. blog_recent_posts is
+         ordered newest-first, so the item just BEFORE the current post
+         in the list was published AFTER it (Next Article), and the item
+         just AFTER it was published BEFORE it (Previous Article).
+         List-append is used to hoist values out of the loop scope.
+         --------------------------------------------------------------- #}
+      {% set _all_posts = blog_recent_posts(group.id, 300) %}
+      {% set _newer_holder = [] %}
+      {% set _older_holder = [] %}
+      {% for p in _all_posts %}
+        {% if p.id == content.id %}
+          {% if not loop.first %}{% do _newer_holder.append(_all_posts[loop.index0 - 1]) %}{% endif %}
+          {% if not loop.last %}{% do _older_holder.append(_all_posts[loop.index0 + 1]) %}{% endif %}
+        {% endif %}
+      {% endfor %}
+      {% set newer_post = _newer_holder[0] if _newer_holder|length > 0 else none %}
+      {% set older_post = _older_holder[0] if _older_holder|length > 0 else none %}
+
+      {# ---------------------------------------------------------------
+         Similar Posts: for each tag on the current post, pull recent
+         posts carrying that tag, merge, drop the current post, dedupe,
+         cap at 3. Earlier tags take priority.
+         --------------------------------------------------------------- #}
+      {% set similar_posts = [] %}
+      {% set seen_post_ids = [] %}
+      {% if content.tag_list %}
+        {% for tag in content.tag_list %}
+          {% set tag_posts = blog_recent_tag_posts('default', tag.slug, 5) %}
+          {% for post in tag_posts %}
+            {% if post.id != content.id and post.id not in seen_post_ids and similar_posts|length < 3 %}
+              {% do seen_post_ids.append(post.id) %}
+              {% do similar_posts.append(post) %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+      {% set has_similar = similar_posts|length > 0 %}
+
+      {# Reading time (words / 200, rounded up, minimum 1) #}
+      {% set _words = content.post_body|striptags|wordcount %}
+      {% set _rt = (_words / 200)|round(0, 'ceil')|int %}
+      {% if _rt < 1 %}{% set _rt = 1 %}{% endif %}
+
+      {# ---------------------------------------------------------------
+         Article shell: the article sits in the center column with the
+         Previous Post (older) card as the left rail and the Next Post
+         (newer) card as the right rail, both aligned to the top of the
+         article. On narrow screens the rails collapse to a row above the
+         article. When there is no adjacent post the rail is simply empty
+         and the article stays centered.
+         --------------------------------------------------------------- #}
+      <div class="article-shell">
+        {% if older_post %}
+          <aside class="article-aside article-aside-prev">
+            <a class="aside-card" href="{{ older_post.absolute_url }}">
+              {% if older_post.featured_image %}
+                <span class="aside-card-thumb">
+                  <img src="{{ older_post.featured_image }}" alt="{{ older_post.featured_image_alt_text|default(older_post.name)|escape_attr }}" loading="lazy" />
+                </span>
+              {% endif %}
+              <span class="aside-card-body">
+                <span class="aside-card-eyebrow">
+                  {% if older_post.blog_post_author %}<span class="aside-card-tag">{{ older_post.blog_post_author.display_name }}</span><span class="aside-card-eyebrow-sep">·</span>{% endif %}<span class="aside-card-eyebrow-date">{{ older_post.publish_date|datetimeformat('%B %e, %Y') }}</span>
+                </span>
+                <span class="aside-card-name">{{ older_post.name }}</span>
+                <span class="aside-card-btn">Previous Post</span>
+              </span>
+            </a>
+          </aside>
+        {% endif %}
+
+        <article class="cureus-blog-post">
+        {% if content.featured_image %}
+          <div class="blog-featured-image">
+            <img
+              src="{{ content.featured_image }}"
+              alt="{{ content.featured_image_alt_text|default(content.name)|escape_attr }}"
+            />
+          </div>
+        {% endif %}
+        <div class="blog-post-eyebrow">
+          <a class="blog-post-eyebrow-author" href="{{ blog_author_url(group.id, content.blog_post_author.slug) }}" rel="author">
+            {{ content.blog_post_author.display_name }}
+          </a>
+          <span class="blog-post-eyebrow-sep">·</span>
+          <time class="blog-post-eyebrow-date" datetime="{{ content.publish_date }}">
+            {{ content.publish_date|datetimeformat('%B %e, %Y') }}
+          </time>
+        </div>
+        <h1 class="blog-post-title">{{ content.name }}</h1>
+        <div class="blog-post-metabar">
+          <span class="blog-read-time">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 8 12 12 15 14"></polyline></svg>
+            {{ _rt }} min read
+          </span>
+          <div class="blog-social-share-links" aria-label="Share this article">
+            <a
+              class="blog-social-share-link blog-social-share-linkedin"
+              href="https://www.linkedin.com/shareArticle?mini=true&amp;url={{ content.absolute_url|urlencode }}&amp;title={{ content.name|urlencode }}"
+              target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn" title="Share on LinkedIn"
+            ><span class="screen-reader-text">LinkedIn</span></a>
+            <a
+              class="blog-social-share-link blog-social-share-x"
+              href="https://twitter.com/intent/tweet?url={{ content.absolute_url|urlencode }}&amp;text={{ content.name|urlencode }}"
+              target="_blank" rel="noopener noreferrer" aria-label="Share on X" title="Share on X"
+            ><span class="screen-reader-text">X</span></a>
+            <a
+              class="blog-social-share-link blog-social-share-facebook"
+              href="https://www.facebook.com/sharer/sharer.php?u={{ content.absolute_url|urlencode }}"
+              target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook" title="Share on Facebook"
+            ><span class="screen-reader-text">Facebook</span></a>
+            <a
+              class="blog-social-share-link blog-social-share-email"
+              href="mailto:?subject={{ content.name|urlencode }}&amp;body={{ content.absolute_url|urlencode }}"
+              aria-label="Share by email" title="Share by email"
+            ><span class="screen-reader-text">Email</span></a>
+          </div>
+        </div>
+        <div class="blog-post-body">
+          {{ content.post_body }}
+        </div>
+        {% if content.tag_list %}
+          <div class="blog-post-tags">
+            {% for tag in content.tag_list %}
+              <a href="{{ blog_tag_url(group.id, tag.slug) }}" rel="tag">{{ tag.name }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+        </article>
+
+        {% if newer_post %}
+          <aside class="article-aside article-aside-next">
+            <a class="aside-card" href="{{ newer_post.absolute_url }}">
+              {% if newer_post.featured_image %}
+                <span class="aside-card-thumb">
+                  <img src="{{ newer_post.featured_image }}" alt="{{ newer_post.featured_image_alt_text|default(newer_post.name)|escape_attr }}" loading="lazy" />
+                </span>
+              {% endif %}
+              <span class="aside-card-body">
+                <span class="aside-card-eyebrow">
+                  {% if newer_post.blog_post_author %}<span class="aside-card-tag">{{ newer_post.blog_post_author.display_name }}</span><span class="aside-card-eyebrow-sep">·</span>{% endif %}<span class="aside-card-eyebrow-date">{{ newer_post.publish_date|datetimeformat('%B %e, %Y') }}</span>
+                </span>
+                <span class="aside-card-name">{{ newer_post.name }}</span>
+                <span class="aside-card-btn">Next Post</span>
+              </span>
+            </a>
+          </aside>
+        {% endif %}
+      </div>
+
+      {# ── SIMILAR POSTS (bottom card row, tag-based) ── #}
+      {% if has_similar %}
+        <section class="similar-section" aria-label="Similar posts">
+          <div class="similar-inner">
+            <div class="section__head">
+              <div>
+                <h2 class="section__title">Similar Posts</h2>
+                <p class="section__sub">Related reading based on this article's topics</p>
+              </div>
+            </div>
+            <div class="cards">
+              {% for post in similar_posts %}
+                <article class="card">
+                  <a href="{{ post.absolute_url }}">
+                    {% if post.featured_image %}
+                      <img class="card__img" src="{{ post.featured_image }}" alt="{{ post.featured_image_alt_text|default(post.name)|escape_attr }}" loading="lazy" />
+                    {% else %}
+                      <span class="card__img"></span>
+                    {% endif %}
+                  </a>
+                  <div class="card__meta">
+                    {% if post.tag_list %}<span class="card__tag">{{ post.tag_list[0].name }}</span>{% endif %}
+                    <span class="card__date">{{ post.publish_date|datetimeformat('%B %e, %Y') }}</span>
+                  </div>
+                  <h3 class="card__title"><a href="{{ post.absolute_url }}">{{ post.name }}</a></h3>
+                  {% set _sw = post.post_body|striptags|wordcount %}{% set _srt = (_sw / 200)|round(0, 'ceil')|int %}{% if _srt < 1 %}{% set _srt = 1 %}{% endif %}
+                  <div class="card__stats">
+                    <span class="stat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><polyline points="12 8 12 12 15 14"></polyline></svg>{{ _srt }} min read</span>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </div>
+        </section>
+      {% endif %}
+
+      {% if group.allow_comments %}
+        <div class="blog-comments-wrapper">
+          <div class="blog-comments-intro">
+            <h2>Join the discussion</h2>
+            <p>Add your email, first name, and last name to leave a comment.</p>
+          </div>
+          <div class="blog-comments-module">
+            {% module 'blog_comments' path='@hubspot/blog_comments', label="Blog comments" %}
+          </div>
+        </div>
+      {% endif %}
+    </main>
+
+    {# ─────────────────────────  FOOTER (matches blog.cureus.com)  ───────────────────────── #}
+    <footer class="site-footer">
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>Published Content</h4>
+          <a href="https://www.cureus.com/specialties">Specialties</a>
+          <a href="https://www.cureus.com/articles">Articles</a>
+          <a href="https://www.cureus.com/posters">Posters</a>
+          <a href="https://www.cureus.com/abstracts">Abstracts</a>
+          <a href="https://www.cureus.com/collections">Collections</a>
+          <a href="https://www.cureus.com/channels/all">Channels</a>
+          <a href="https://www.cureus.com/competitions/past_competitions">Competitions</a>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <a href="https://www.cureus.com/guides">Cureus Guides</a>
+          <a href="https://www.cureus.com/honors">Cureus Honors</a>
+          <a href="https://www.cureus.com/cureus_editing_services">Author Fees</a>
+          <a href="https://www.cureus.com/siq">SIQ</a>
+          <a href="https://www.cureus.com/article_promotion">Article Promotion</a>
+          <a href="https://www.cureus.com/advertising">Advertising Policy</a>
+          <a href="https://www.cureus.com/ads_sponsorship">Advertise With Us</a>
+          <a href="https://www.cureus.com/privacy">Privacy Policy</a>
+          <a href="https://www.springernature.com/gp/legal/us-state-privacy-rights">US State Privacy Rights</a>
+          <a href="https://www.cureus.com/terms">Terms of Use</a>
+          <a href="https://www.cureus.com/faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h4>About Us</h4>
+          <a href="https://www.cureus.com/about">About Cureus</a>
+          <a href="https://www.cureus.com/editorial_board">Editorial Board</a>
+          <a href="https://www.cureus.com/associate_editors">Associate Editors</a>
+          <a href="https://www.cureus.com/about_publishing">About Publishing</a>
+          <a href="https://www.cureus.com/about_peer_review">About Peer Review</a>
+          <a href="https://www.cureus.com/channels">About Channels</a>
+          <a href="https://www.cureus.com/about_collections">About Collections</a>
+          <a href="https://www.cureus.com/competitions">About Competitions</a>
+          <a href="https://www.cureus.com/partnerships">Partnerships</a>
+          <a href="https://www.cureus.com/careers">Careers</a>
+          <a href="https://www.cureus.com/sitemap">Sitemap</a>
+        </div>
+        <div class="footer-col">
+          <h4>Stay Connected</h4>
+          <a href="https://www.cureus.com/contact">Contact Us</a>
+          <a href="https://www.cureus.com/email_preferences">Emails and Alerts</a>
+          <a href="https://www.linkedin.com/company/cureus/">LinkedIn</a>
+          <a href="https://www.facebook.com/CureusJournalofMedicalScience/">Facebook</a>
+          <a href="https://x.com/cureusmedical">X</a>
+          <a href="https://www.instagram.com/cureusmedical/">Instagram</a>
+          <a href="https://www.youtube.com/channel/UCtJKOEpL-TGVsq-u8H3sPzQ">Youtube</a>
+          <a href="https://bsky.app/profile/cureusmedical.bsky.social">BlueSky</a>
+          <a href="https://www.tiktok.com/@cureusmedical">TikTok</a>
+        </div>
+      </div>
+      <div class="newsletter">
+        <div class="newsletter__inner">
+          <h3 class="newsletter__title">Subscribe to our newsletter for all the latest news and updates</h3>
+          <form class="newsletter__form" data-hsform>
+            <input type="email" name="email" required placeholder="Enter your email address" aria-label="Email address">
+            <button type="submit">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div class="footer-bottom__inner">
+          <span>ISSN: 2168-8184</span>
+          <span>Public user content licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a></span>
+          <span>CUREUS&reg; is a registered trademark of Cureus, Inc. in the United States.</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      /* Newsletter -> submits to the HubSpot form's API, which records a real form
+         submission (so form-triggered workflows still fire). Portal 46589883, form 4969c11e-... */
+      (function () {
+        var ENDPOINT = 'https://api.hsforms.com/submissions/v3/integration/submit/46589883/4969c11e-c011-42c4-a1e1-3878c72f7aa2';
+        document.querySelectorAll('form[data-hsform]').forEach(function (f) {
+          f.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var input = f.querySelector('input[type="email"]');
+            var email = input ? input.value.trim() : '';
+            if (!email) return;
+            var btn = f.querySelector('button');
+            if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
+            var hutk = (document.cookie.match(/hubspotutk=([^;]+)/) || [])[1];
+            var ctx = { pageUri: location.href, pageName: document.title };
+            if (hutk) { ctx.hutk = hutk; }
+            fetch(ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ fields: [{ name: 'email', value: email }], context: ctx })
+            }).then(function (r) {
+              if (r.ok) {
+                f.innerHTML = '<span style="font-family:\'Inter\',\'Helvetica Neue\',Arial,sans-serif;font-size:15px;font-weight:500;color:#1a9fbd;">Thanks — you\'re subscribed!</span>';
+              } else {
+                if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+                r.json().then(function (d) { alert((d && d.message) || 'Sorry, something went wrong. Please try again.'); }).catch(function () { alert('Sorry, something went wrong. Please try again.'); });
+              }
+            }).catch(function () {
+              if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+              alert('Network error. Please try again.');
+            });
+          });
+        });
+      })();
+    </script>
+    <script>
+      /* Footer links open in a new tab */
+      (function () {
+        document.querySelectorAll('.site-footer a[href^="http"]').forEach(function (a) {
+          a.setAttribute('target', '_blank');
+          a.setAttribute('rel', 'noopener noreferrer');
+        });
+      })();
+    </script>
+    <script>
+      /* Keep the Previous/Next post cards equal height so their buttons line up,
+         regardless of how many lines each title wraps to (no title truncation). */
+      (function () {
+        function equalize() {
+          var prev = document.querySelector('.article-aside-prev .aside-card');
+          var next = document.querySelector('.article-aside-next .aside-card');
+          if (!prev || !next) { return; }
+          prev.style.minHeight = '';
+          next.style.minHeight = '';
+          if (window.innerWidth <= 560) { return; } /* stacked on small screens — no need */
+          var h = Math.max(prev.offsetHeight, next.offsetHeight);
+          prev.style.minHeight = h + 'px';
+          next.style.minHeight = h + 'px';
+        }
+        window.addEventListener('load', equalize);
+        window.addEventListener('resize', equalize);
+      })();
+    </script>
+    <script>
+      /* Fix the missing space in the native HubSpot "Reply to<Name>" comment buttons. */
+      (function () {
+        function fixReplySpacing() {
+          var wrap = document.querySelector('.blog-comments-wrapper');
+          if (!wrap) { return; }
+          wrap.querySelectorAll('a, button').forEach(function (el) {
+            if (!/reply to\S/i.test(el.textContent || '')) { return; } /* only the ones missing the space */
+            el.childNodes.forEach(function (node) {
+              if (node.nodeType !== 3) { return; } /* text nodes only */
+              var t = node.textContent;
+              var fixed = t.replace(/(reply to)(\S)/i, '$1 $2');
+              if (fixed === t && /\bto$/i.test(t.trim()) && !/\s$/.test(t) && node.nextSibling) { fixed = t + ' '; }
+              if (fixed !== t) { node.textContent = fixed; }
+            });
+          });
+        }
+        fixReplySpacing();
+        window.addEventListener('load', fixReplySpacing);
+        var n = 0, t = setInterval(function () { fixReplySpacing(); if (++n > 10) { clearInterval(t); } }, 500);
+      })();
+    </script>
+    <!-- Mobile navigation (hamburger) — builds a mobile menu from the existing nav on small screens -->
+    <style>
+      .nav__toggle{ display:none; align-items:center; justify-content:center; width:42px; height:42px; padding:0; border:1px solid var(--line); border-radius:8px; background:#fff; color:#2b3137; cursor:pointer; }
+      .nav__toggle svg{ display:block; }
+      #cureusMobileMenu{ display:none; border-bottom:1px solid var(--line); background:#fff; }
+      #cureusMobileMenu.is-open{ display:block; }
+      #cureusMobileMenu ul{ list-style:none; margin:0; padding:8px 0; }
+      #cureusMobileMenu a{ display:block; padding:11px 24px; font-family:var(--sans); font-size:15px; color:#2b3137; text-decoration:none; }
+      #cureusMobileMenu a:hover{ background:#f5fafc; color:var(--teal); }
+      #cureusMobileMenu a.is-child{ padding-left:44px; font-size:14px; color:#52606b; }
+      #cureusMobileMenu .sep{ height:1px; background:var(--line); margin:6px 0; }
+      @media (max-width:820px){
+        .nav__menu, .subnav__menu{ display:none !important; }
+        .nav__toggle{ display:inline-flex; }
+        .nav__right{ margin-left:auto; }
+      }
+    </style>
+    <script>
+    (function(){
+      function init(){
+        var navInner=document.querySelector('.nav__inner');
+        if(!navInner||document.querySelector('.nav__toggle'))return;
+        var btn=document.createElement('button');
+        btn.type='button';btn.className='nav__toggle';btn.setAttribute('aria-label','Menu');btn.setAttribute('aria-expanded','false');
+        btn.innerHTML='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+        navInner.insertBefore(btn,navInner.firstChild);
+        var panel=document.createElement('nav');panel.id='cureusMobileMenu';panel.setAttribute('aria-label','Mobile menu');
+        var ul=document.createElement('ul');
+        function addLink(a,child){if(!a)return;var li=document.createElement('li');var na=document.createElement('a');na.href=a.getAttribute('href')||'#';na.textContent=(a.textContent||'').trim();if(child)na.className='is-child';li.appendChild(na);ul.appendChild(li);}
+        function addMenu(menu,ddSel){if(!menu)return;menu.querySelectorAll(':scope > li').forEach(function(li){addLink(li.querySelector(':scope > a'),false);var dd=li.querySelector(ddSel);if(dd){dd.querySelectorAll('li > a').forEach(function(ca){addLink(ca,true);});}});}
+        addMenu(document.querySelector('.nav__menu'),'.nav__dd');
+        var sub=document.querySelector('.subnav__menu');
+        if(sub&&sub.querySelector('li')){var sep=document.createElement('li');sep.innerHTML='<div class="sep"></div>';ul.appendChild(sep);addMenu(sub,'.subnav__dd');}
+        panel.appendChild(ul);
+        var anchor=document.querySelector('.subnav')||document.querySelector('.nav');
+        anchor.parentNode.insertBefore(panel,anchor.nextSibling);
+        btn.addEventListener('click',function(){var open=panel.classList.toggle('is-open');btn.setAttribute('aria-expanded',open?'true':'false');});
+      }
+      if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+    })();
+    </script>
+    <script>
+    /* Link target policy: menu links and links that stay within the blog (reading a post,
+       category/tag pages, pagination, search) open in the SAME tab. Every link that leaves
+       the blog — the main Cureus site, the logo, footer, social, external references — opens
+       in a NEW tab so the blog stays open. */
+    (function(){
+      var host = location.hostname;
+      function inMenu(a){
+        return a.closest('.nav__menu') || a.closest('.subnav__menu') || a.closest('#cureusMobileMenu');
+      }
+      function apply(){
+        document.querySelectorAll('a[href]').forEach(function(a){
+          if (a.dataset.tabDone) return;
+          if (inMenu(a)) { a.dataset.tabDone='1'; return; }            // menu links: same tab
+          var raw = a.getAttribute('href') || '';
+          if (!raw || raw.charAt(0)==='#' || /^(javascript:|mailto:|tel:)/i.test(raw)) { a.dataset.tabDone='1'; return; }
+          var url; try { url = new URL(a.href, location.href); } catch(e){ a.dataset.tabDone='1'; return; }
+          if (url.protocol !== 'http:' && url.protocol !== 'https:') { a.dataset.tabDone='1'; return; }
+          // Leaves the blog when: different host, OR footer link, OR the site logo.
+          var leavesBlog = (url.hostname !== host) || !!a.closest('.site-footer') || a.classList.contains('nav__logo');
+          if (leavesBlog) { a.setAttribute('target','_blank'); a.setAttribute('rel','noopener noreferrer'); }
+          a.dataset.tabDone='1';
+        });
+      }
+      apply();
+      if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', apply);
+      window.addEventListener('load', apply);   // catch the mobile menu built on load
+    })();
+    </script>
+
+    {{ standard_footer_includes }}
+  </body>
+</html>
